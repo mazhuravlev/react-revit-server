@@ -1,0 +1,89 @@
+.details {
+    min-width: 400px;
+    min-height: 400px;
+}
+
+.tree {
+    height: calc(100% - 50px);
+    user-select: none;
+}
+
+.tree > ul {
+    min-height: 100%;
+}
+.hi {
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: scroll;
+}
+
+.left-scroll {
+    direction: rtl;
+}
+
+.left-scroll > * {
+    direction: ltr;
+}
+
+.nopad {
+    padding: 0 !important;
+}
+
+.hi::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    /*border-radius: 10px;*/
+    background-color: #F5F5F5;
+}
+
+.hi::-webkit-scrollbar
+{
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+.hi::-webkit-scrollbar-thumb
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #3c3f41;
+    transition: background-color 1s;
+}
+
+table.table-condensed td, table.table-condensed th {
+    padding: 0.25rem;
+}
+
+.chart {
+    margin: 24px 0;
+}
+
+.ttip {
+    padding: 4px;
+    border-radius: 4px;
+    background-color: rgba(193, 193, 193, 0.53);
+}
+
+.user-list {
+    list-style: none;
+    font-size: small;
+}
+
+.tree-link {
+    color: rgb(157, 165, 171);
+    text-decoration: none;
+}
+
+.my-menu > label {
+    position: relative;
+    top: 8px;
+    left: 16px
+}
+
+.my-menu {
+    height: 50px;
+    background-color: #3c3f41;
+}
+
+.react-toggle-track-x, .react-toggle-track-check{
+    display: none !important;
+}
