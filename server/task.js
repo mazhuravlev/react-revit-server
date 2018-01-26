@@ -9,20 +9,18 @@ const cron = require('node-cron');
 Promise.resolve().then(async () => await run())
     .then(cron.schedule('* 10 * * *', function () {
         Promise.resolve().then(() => run());
-    })).then(cron.schedule('* * * * *', function () {
-    console.log('!!!CRON!!!1111');
-}));
+    }));
 
 
 async function run() {
     const startTime = new moment();
     const week = moment().startOf('week');
     log('start');
-    //const data = await getFolderTree('|');
-    //if(!data) return;
-    //const models = flattenTree(data);
+    const data = await getFolderTree('|');
+    if (!data) return;
+    const models = flattenTree(data);
     //fs.writeFileSync('flat.json', JSON.stringify(models));
-    const models = JSON.parse(fs.readFileSync('server/flat.json'));
+    //const models = JSON.parse(fs.readFileSync('server/flat.json'));
     for (let i = 0; i < models.length; i++) {
         const modelData = models[i];
         if (!modelData.history) continue;
@@ -79,6 +77,3 @@ function flattenTree(tree) {
 function log(o) {
     return console.log(`[${new moment().format('HH:mm:ss')}] ${o}`);
 }
-
-
-console.log('exit!!1');
