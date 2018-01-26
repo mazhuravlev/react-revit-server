@@ -1,4 +1,4 @@
-import {FETCH_MODEL_DETAILS} from "../actions";
+import {BEGIN_FETCH_MODEL_DETAILS, FETCH_MODEL_DETAILS} from "../actions";
 import * as _ from 'lodash';
 import {mean} from "../math";
 
@@ -23,10 +23,14 @@ function processHistory(_history) {
 }
 
 export default function reducerModelDetails(state = null, action) {
-    if (action.type === FETCH_MODEL_DETAILS) {
-        return {...action.payload.data, processedHistory: processHistory(action.payload.data.history)};
+    switch(action.type) {
+        case BEGIN_FETCH_MODEL_DETAILS:
+            return null;
+        case  FETCH_MODEL_DETAILS:
+            return {...action.payload.data, processedHistory: processHistory(action.payload.data.history)};
+        default:
+            return state;
     }
-    return state;
 }
 
 function padWeek(w) {

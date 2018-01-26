@@ -35,10 +35,5 @@ app.use(logger());
 app.use(bodyparser());
 app.use(api.routes());
 
-// Promise.resolve().then(async () =>{
-//     const m = await Model.findById(("5a65fa8f49d5aa43a4849be1")).populate('history').exec();
-//     console.log(m);
-// });
-
 console.log(`Listening on ${PORT}`);
 app.listen(PORT);

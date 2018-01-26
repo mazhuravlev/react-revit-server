@@ -1,17 +1,8 @@
 const axios = require('axios');
 const urlencode = require('urlencode');
 const fs = require('fs');
-const Moment = require('moment');
 const mongoose = require('mongoose');
 
-
-// Promise.resolve().then(async () => {
-//   const startTime = new Moment();
-//   log('start');
-//   const tree = await getFolderTree('|');
-//   fs.writeFileSync('data.json', JSON.stringify(tree));
-//   log(Moment.duration(new Moment().diff(startTime)).humanize() + ' elapsed');
-// });
 
 async function getFolderTree(folder) {
   const data = await getFolderData(folder);
@@ -39,8 +30,8 @@ async function getFolderTree(folder) {
 
 const ROOT_URL = 'http://10.177.100.96/RevitServerAdminRESTService2017/AdminRESTService.svc';
 const HEADERS = {
-  'User-Name': 'vasya',
-  'User-Machine-Name': 'vasya',
+  'User-Name': 'Test',
+  'User-Machine-Name': 'Test',
   'Operation-GUID': 'db0e9239-3d18-47ee-b85d-9018bc172b0b',
 };
 

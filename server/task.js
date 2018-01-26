@@ -16,9 +16,9 @@ async function run() {
     const week = moment().startOf('week');
     log('start');
     const data = await getFolderTree('|');
-    if(!data) return;
+    if (!data) return;
     const models = flattenTree(data);
-    fs.writeFileSync('flat.json', JSON.stringify(models));
+    //fs.writeFileSync('flat.json', JSON.stringify(models));
     //const models = JSON.parse(fs.readFileSync('server/flat.json'));
     for (let i = 0; i < models.length; i++) {
         const modelData = models[i];
