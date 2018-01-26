@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const ROOT_URL = `http://localhost:9121`;
+const ROOT_URL = `/api`;
 
 export const FETCH_MODELS = 'FETCH_MODELS';
 export const FETCH_MODEL_DETAILS = 'FETCH_MODEL_DETAILS';

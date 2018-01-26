@@ -6,7 +6,7 @@ export default function reducerModelsWeek(state = {}, action) {
         const data = action.payload.data;
         const c = [data.filter(x => x.weekSync > 0), data.filter(x => x.weekSync === 0)];
         return {
-            name: 'Модели',
+            name: '------>',
             toggled: true,
             children: [
                 {name: `>0 синх (${c[0].length} шт)`, children:c[0].map(y => ({name: `${y.name} (${y.weekSync})`, model: y}))},

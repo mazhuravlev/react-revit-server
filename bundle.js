@@ -35183,7 +35183,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var ROOT_URL = 'http://localhost:9121';
+	var ROOT_URL = '/api';
 
 	var FETCH_MODELS = exports.FETCH_MODELS = 'FETCH_MODELS';
 	var FETCH_MODEL_DETAILS = exports.FETCH_MODEL_DETAILS = 'FETCH_MODEL_DETAILS';
@@ -113439,7 +113439,7 @@
 	        currentPart.isPath = true;
 	        currentPart.models.push(model);
 	    }
-	    var tree = { name: 'Модели', toggled: true, children: [] };
+	    var tree = { name: '------>', toggled: true, children: [] };
 	    Object.values(parts).filter(function (x) {
 	        return x.isPath && !x.parent;
 	    }).forEach(function (x) {
@@ -113567,7 +113567,7 @@
 	            return x.weekSync === 0;
 	        })];
 	        return {
-	            name: 'Модели',
+	            name: '------>',
 	            toggled: true,
 	            children: [{ name: '>0 \u0441\u0438\u043D\u0445 (' + c[0].length + ' \u0448\u0442)', children: c[0].map(function (y) {
 	                    return { name: y.name + ' (' + y.weekSync + ')', model: y };

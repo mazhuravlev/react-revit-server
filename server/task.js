@@ -7,22 +7,19 @@ const moment = require('moment');
 const cron = require('node-cron');
 
 Promise.resolve().then(async () => await run())
-    .then(cron.schedule('* 10 * * *', function () {
+    .then(cron.schedule('10 * * * *', function () {
         Promise.resolve().then(() => run());
-    })).then(cron.schedule('* * * * *', function () {
-    console.log('!!!CRON!!!1111');
-}));
-
+    }));
 
 async function run() {
     const startTime = new moment();
     const week = moment().startOf('week');
     log('start');
-    //const data = await getFolderTree('|');
-    //if(!data) return;
-    //const models = flattenTree(data);
-    //fs.writeFileSync('flat.json', JSON.stringify(models));
-    const models = JSON.parse(fs.readFileSync('server/flat.json'));
+    const data = await getFolderTree('|');
+    if(!data) return;
+    const models = flattenTree(data);
+    fs.writeFileSync('flat.json', JSON.stringify(models));
+    //const models = JSON.parse(fs.readFileSync('server/flat.json'));
     for (let i = 0; i < models.length; i++) {
         const modelData = models[i];
         if (!modelData.history) continue;
@@ -32,9 +29,9 @@ async function run() {
             model._id = new mongoose.Types.ObjectId;
             model.fullName = modelData.history.Path;
             model.name = modelData.model.Name;
-            model.weekSync = 0;
             const res = await model.save();
         }
+	model.weekSync = 0;
         model.modelSize = modelData.model.ModelSize;
         model.history = [];
         const res = await History.find({model: model._id}).remove();
@@ -79,6 +76,3 @@ function flattenTree(tree) {
 function log(o) {
     return console.log(`[${new moment().format('HH:mm:ss')}] ${o}`);
 }
-
-
-console.log('exit!!1');

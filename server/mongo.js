@@ -3,7 +3,7 @@ const Schema = Mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 Mongoose.Promise = global.Promise;
 
-const mongo = Mongoose.connect('mongodb://localhost/models');
+const mongo = Mongoose.connect('mongodb://user:user@localhost/models');
 
 const HistorySchema = Schema({
     _id: ObjectId,

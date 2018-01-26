@@ -10,6 +10,7 @@ const PORT = 9121;
 
 const app = new Koa();
 const router = new Router();
+const api = new Router();
 
 router.get('/models', async ctx => {
     const cursor = await Mongoose.connection.db.collection('models').aggregate([
@@ -17,13 +18,9 @@ router.get('/models', async ctx => {
         {$sort: {weekSync: -1}}
     ]);
     ctx.body = await cursor.toArray();
-});
-
-router.get('/models/:id', async ctx => {
+}).get('/models/:id', async ctx => {
     ctx.body = await Model.findOne({_id: ctx.params.id}).populate('history').exec();
-});
-
-router.get('/history', async ctx => {
+}).get('/history', async ctx => {
     const cursor = await Mongoose.connection.db.collection('histories').aggregate([
         {$group: {_id: "$user", count: {$sum: 1}}},
         {$sort: {count: -1}}
@@ -31,10 +28,12 @@ router.get('/history', async ctx => {
     ctx.body = await cursor.toArray();
 });
 
+api.use('/api', router.routes());
+
 app.use(cors());
 app.use(logger());
 app.use(bodyparser());
-app.use(router.routes());
+app.use(api.routes());
 
 // Promise.resolve().then(async () =>{
 //     const m = await Model.findById(("5a65fa8f49d5aa43a4849be1")).populate('history').exec();
