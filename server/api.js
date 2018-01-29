@@ -2,7 +2,7 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
-const cors = require('koa-cors');
+const cors = require('@koa/cors');
 const {Model, History} = require('./mongo');
 const Mongoose = require('mongoose');
 

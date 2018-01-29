@@ -14,7 +14,7 @@ class _ModelDetails extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if (this.modelId === props.match.params.id) {
+        if (this.modelId === props.match.params.id && props.details) {
             return;
         }
         this.props.fetchModelDetails(props.match.params.id);
@@ -23,7 +23,7 @@ class _ModelDetails extends Component {
 
     render() {
         const details = this.props.details;
-        if (!details) return <div>Загрузка..</div>;
+        if (!details) return (<div className='loader'/>);
 
         const chartData = details.processedHistory;
         const users = _.sortBy(Object.values(_.groupBy(details.history, 'user')), x => -x.length).map(x => (

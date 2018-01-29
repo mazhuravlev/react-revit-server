@@ -1,3 +1,7 @@
+body {
+    overflow: hidden;
+}
+
 .details {
     min-width: 400px;
     min-height: 400px;
@@ -11,6 +15,7 @@
 .tree > ul {
     min-height: 100%;
 }
+
 .hi {
     height: 100vh;
     max-height: 100vh;
@@ -29,22 +34,19 @@
     padding: 0 !important;
 }
 
-.hi::-webkit-scrollbar-track
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+.hi::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     /*border-radius: 10px;*/
     background-color: #F5F5F5;
 }
 
-.hi::-webkit-scrollbar
-{
+.hi::-webkit-scrollbar {
     width: 12px;
     background-color: #F5F5F5;
 }
 
-.hi::-webkit-scrollbar-thumb
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+.hi::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: #3c3f41;
     transition: background-color 1s;
 }
@@ -73,17 +75,29 @@ table.table-condensed td, table.table-condensed th {
     text-decoration: none;
 }
 
-.my-menu > label {
+.my-menu > span {
     position: relative;
     top: 8px;
-    left: 16px
+    margin: 0 10px;
 }
 
 .my-menu {
     height: 50px;
     background-color: #3c3f41;
+    padding-top: 5px;
+    padding-left: 16px;
 }
 
-.react-toggle-track-x, .react-toggle-track-check{
+.react-toggle-track-x, .react-toggle-track-check {
     display: none !important;
+}
+
+.loader {
+    background: url(/loader.gif) no-repeat center center;
+    height: 100%;
+    width: 100%;
+}
+
+.fa.fa-file-text {
+    margin-right: 6px;
 }

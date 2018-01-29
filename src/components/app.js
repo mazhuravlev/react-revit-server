@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ModelDetails from "../containers/model_details";
 import History from "../containers/history";
-import {BrowserRouter, Link, Route} from "react-router-dom";
+import {BrowserRouter, Link, NavLink, Route} from "react-router-dom";
 import ListSelector from "../containers/list-selector";
 import ModelListWeek from "../containers/model_list_week";
 
@@ -23,8 +23,8 @@ class _App extends Component {
                     <div className="row">
                         <div className="col-md-4 hi nopad left-scroll">
                             <div className='my-menu'>
-                                <Link className="btn" to="/">Статистика</Link>
                                 <ListSelector style='margin-left: 16px;'/>
+                                <NavLink exact={true} activeStyle={{display: 'none'}} className="btn btn-primary btn-sm" to="/">Пользователи</NavLink>
                             </div>
                             {list}
                         </div>

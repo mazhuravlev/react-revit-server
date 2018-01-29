@@ -19,13 +19,12 @@ class _ListSelector extends Component {
     render() {
        //return <input type='checkbox' onChange={this.onCheckbox} checked={this.props.listType}/>;
         return (
-            <label>
+            <span>
                 <Toggle
                     defaultChecked={this.props.listType}
 
                     onChange={this.onCheckbox} />
-                <span>Синхр</span>
-            </label>
+            </span>
         );
     }
 }

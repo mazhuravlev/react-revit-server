@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": "git@github.com:StephenGrider/ReduxSimpleStarter.git",
   "scripts": {
-    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+    "start": "webpack-dev-server",
     "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive ./test",
     "test:watch": "npm run test -- --watch",
     "build": "webpack"
@@ -29,12 +29,12 @@
     "webpack-dev-server": "^1.14.0"
   },
   "dependencies": {
+    "@koa/cors": "^2.2.1",
     "axios": "^0.17.1",
     "babel-preset-stage-1": "^6.1.18",
     "chart.js": "^1.1.1",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",
-    "koa-cors": "0.0.16",
     "koa-logger": "^3.1.0",
     "koa-router": "^7.3.0",
     "lodash": "^3.10.1",

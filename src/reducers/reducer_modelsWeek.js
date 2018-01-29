@@ -6,7 +6,7 @@ export default function reducerModelsWeek(state = {}, action) {
         const data = action.payload.data;
         const c = [data.filter(x => x.weekSync > 0), data.filter(x => x.weekSync === 0)];
         return {
-            name: '------>',
+            name: 'По синхронизациям за последнюю неделю',
             toggled: true,
             children: [
                 {name: `>0 синх (${c[0].length} шт)`, children:c[0].map(y => ({name: `${y.name} (${y.weekSync})`, model: y}))},
@@ -15,10 +15,4 @@ export default function reducerModelsWeek(state = {}, action) {
         };
     }
     return state;
-}
-
-function getName(models) {
-    const max = _.max(models, 'weekSync').weekSync;
-    const min = _.min(models, 'weekSync').weekSync;
-    return `${max} - ${min}`;
 }

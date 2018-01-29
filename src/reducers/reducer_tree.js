@@ -27,7 +27,7 @@ function makeTree(models) {
         currentPart.isPath = true;
         currentPart.models.push(model);
     }
-    const tree = {name: '------>', toggled: true, children: []};
+    const tree = {name: 'По папкам', toggled: true, children: []};
     Object.values(parts).filter(x => x.isPath && !x.parent).forEach(x => {
         tree.children.push({name: x.name.replace(/^(\d{4})_/, '$1   '), children: x.models.map(y => ({name: y.name, model: y}))});
     });
