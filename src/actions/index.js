@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {DOWNLOAD_START} from "../sagas";
 
 const ROOT_URL = `/api`;
 
@@ -7,6 +8,12 @@ export const FETCH_MODEL_DETAILS = 'FETCH_MODEL_DETAILS';
 export const BEGIN_FETCH_MODEL_DETAILS = 'BEGIN_FETCH_MODEL_DETAILS';
 export const FETCH_HISTORY = 'FETCH_HISTORY';
 export const SWITCH_LIST_TYPE = 'SWITCH_LIST_TYPE';
+export const SET_TOKEN = 'SET_TOKEN';
+export const RESET_TOKEN = 'RESET_TOKEN';
+export const BEGIN_FETCH_A360_INFO = 'BEGIN_FETCH_A360_INFO';
+export const FETCH_A360_INFO = 'FETCH_A360_INFO';
+export const LOGOUT = 'LOGOUT';
+export const REMOVE_DOWNLOAD = 'REMOVE_DOWNLOAD';
 
 export function fetchModels() {
     const url = `${ROOT_URL}/models`;
@@ -49,4 +56,56 @@ export function switchListType(type) {
         type: SWITCH_LIST_TYPE,
         payload: type
     };
+}
+
+export function setToken(tokenData) {
+    return {
+        type: SET_TOKEN,
+        payload: tokenData
+    }
+}
+
+
+
+export function resetToken(token) {
+    return {
+        type: RESET_TOKEN,
+    }
+}
+
+export function getA360Info() {
+    return (dispatch, getState) => {
+        const url = `https://developer.api.autodesk.com/userprofile/v1/users/@me`;
+        const token = getState().a360.token.access_token;
+        const request = axios.get(url, {headers: {'Authorization': 'Bearer ' + token}});
+        dispatch({
+            type: BEGIN_FETCH_A360_INFO
+        });
+        request.then(data => {
+            dispatch({
+                type: FETCH_A360_INFO,
+                payload: data.data
+            });
+        }).catch(e => console.error(e));
+    };
+}
+
+export function logout() {
+    return {
+        type: LOGOUT
+    };
+}
+
+export function downloadModel(path) {
+    return {
+        type: DOWNLOAD_START,
+        payload: {path}
+    }
+}
+
+export function removeDownload(path) {
+    return {
+        type: REMOVE_DOWNLOAD,
+        payload: {path}
+    }
 }

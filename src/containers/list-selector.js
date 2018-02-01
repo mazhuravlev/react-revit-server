@@ -6,7 +6,7 @@ import "react-toggle/style.css";
 import Toggle, {Heart} from 'react-toggle';
 
 
-class _ListSelector extends Component {
+class ListSelector extends Component {
     constructor(props) {
         super(props);
         this.onCheckbox = this.onCheckbox.bind(this);
@@ -17,25 +17,26 @@ class _ListSelector extends Component {
     }
 
     render() {
-       //return <input type='checkbox' onChange={this.onCheckbox} checked={this.props.listType}/>;
+        //return <input type='checkbox' onChange={this.onCheckbox} checked={this.props.listType}/>;
         return (
             <span>
                 <Toggle
                     defaultChecked={this.props.listType}
 
-                    onChange={this.onCheckbox} />
+                    onChange={this.onCheckbox}/>
             </span>
         );
     }
 }
 
 function mapStateToProps(state) {
-    return {listType: state.settings.listType};
+    return {
+        listType: state.settings.listType
+    };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({switchListType}, dispatch);
 }
 
-const ListSelector = connect(mapStateToProps, mapDispatchToProps)(_ListSelector);
-export default ListSelector;
+export default ListSelector = connect(mapStateToProps, mapDispatchToProps)(ListSelector);

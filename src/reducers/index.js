@@ -5,6 +5,8 @@ import reducerTree from "./reducer_tree";
 import reducerHistory from "./reducer_history";
 import reducerSettings from "./reducer_settings";
 import reducerModelsWeek from "./reducer_modelsWeek";
+import reducerA360 from './reducer_a360';
+import reducerDownload from './reducer_download';
 
 const rootReducer = combineReducers({
     models: reducerModels,
@@ -12,7 +14,9 @@ const rootReducer = combineReducers({
     tree: reducerTree,
     history: reducerHistory,
     settings: reducerSettings,
-    modelsWeek: reducerModelsWeek
+    modelsWeek: reducerModelsWeek,
+    a360: reducerA360,
+    download: reducerDownload
 });
 
 export default rootReducer;

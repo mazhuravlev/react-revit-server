@@ -6,7 +6,7 @@ import {fetchModelDetails} from "../actions";
 import {decorators, Treebeard} from 'react-treebeard';
 import {Link} from "react-router-dom";
 
-class _ModelList extends Component {
+class ModelList extends Component {
     constructor(props) {
         super(props);
         this.decorators = decorators;
@@ -45,8 +45,10 @@ class _ModelList extends Component {
             Toggle: this.decorators.Toggle,
             Header: ({node, style}) => {
                 const c = node.model ? (
-                    <Link className='tree-link' to={'/model/'+node.model._id}><i className="fa fa-file-text" aria-hidden="true"/>{node.name}</Link>
-                ) :  node.name;
+                    <Link className='tree-link' to={'/model/' + node.model._id}><i className="fa fa-file-text"
+                                                                                   aria-hidden="true"/>{node.name}
+                    </Link>
+                ) : node.name;
                 return (
                     <div style={style.base}>
                         <div style={style.title}>
@@ -77,5 +79,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({}, dispatch)
 }
 
-const ModelList = connect(mapStateToProps, mapDispatchToProps)(_ModelList);
-export default ModelList;
+export default ModelList = connect(mapStateToProps, mapDispatchToProps)(ModelList);

@@ -31,7 +31,8 @@ async function run() {
             model.name = modelData.model.Name;
             const res = await model.save();
         }
-	model.weekSync = 0;
+        model.weekSync = 0;
+        model.lastSync = new Date();
         model.modelSize = modelData.model.ModelSize;
         model.history = [];
         const res = await History.find({model: model._id}).remove();

@@ -19,6 +19,7 @@ const ModelSchema = Schema({
     name: String,
     fullName: String,
     weekSync: Number,
+    lastSync: Date,
     history: [{ type: ObjectId, ref: 'history' }]
 });
 const Model = Mongoose.model('model', ModelSchema);

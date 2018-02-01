@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import Chart2 from "../components/chart2";
-import {fetchModelDetails} from "../actions";
+import {downloadModel, fetchModelDetails} from "../actions";
 import {bindActionCreators} from "redux";
 
-class _ModelDetails extends Component {
+function copyToClipboard(text) {
+    window.prompt("Копировать: Ctrl+C, Enter", 'RSN://vpp-revit01.main.picompany.ru/' + text.replace(/\\/, '/'));
+}
+
+class ModelDetails extends Component {
     componentWillMount() {
         if (this.props.match) this.props.fetchModelDetails(this.props.match.params.id);
     }
@@ -34,8 +38,14 @@ class _ModelDetails extends Component {
         ));
         return (
             <div className="details">
-                <h3>{details.name.replace('.rvt', '')}</h3>
-                <div>Путь: {details.fullName}</div>
+                <h3>{details.name.replace('.rvt', '')}
+                    <span className='btn btn-my btn-sm'
+                          onClick={() => copyToClipboard(details.fullName)}>Копировать</span>
+                </h3>
+                <button className='btn btn-primary' onClick={() => this.props.downloadModel(details.fullName)}
+                disabled={details.fullName in this.props.download}>
+                    Подготовить скачивание
+                </button>
                 <div>Всего синхронизаций: {details.history.length}</div>
                 <Chart2 data={chartData} color='orange'/>
                 <table className='table'>
@@ -53,13 +63,15 @@ class _ModelDetails extends Component {
 }
 
 function mapStateToProps(state) {
-    return {details: state.details}
+    return {
+        details: state.details,
+        download: state.download
+    }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({fetchModelDetails}, dispatch)
+    return bindActionCreators({fetchModelDetails, downloadModel}, dispatch)
 }
 
 
-const ModelDetails = connect(mapStateToProps, mapDispatchToProps)(_ModelDetails);
-export default ModelDetails;
+export default ModelDetails = connect(mapStateToProps, mapDispatchToProps)(ModelDetails);

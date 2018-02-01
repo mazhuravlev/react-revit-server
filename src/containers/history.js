@@ -29,5 +29,4 @@ function mapStateToProps(state) {
     return {history: state.history};
 }
 
-const History = connect(mapStateToProps)(_History);
-export default History;
+export default History = connect(mapStateToProps)(_History);
