@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {removeDownload} from "../actions";
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 const loader = require('../loader-sm.gif');
+
 
 class Download extends Component {
     render() {
@@ -16,9 +18,13 @@ class Download extends Component {
                         <th>Скачать</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <ReactCSSTransitionGroup
+                        transitionName="example"
+                        transitionEnterTimeout={500}
+                        transitionLeaveTimeout={300}
+                        component="tbody">
                     {paths.map(x => this.makeRow(x))}
-                    </tbody>
+                    </ReactCSSTransitionGroup>
                 </table>
             </div>
         );

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {DOWNLOAD_START} from "../sagas";
+import {DOWNLOAD_NWC_START, DOWNLOAD_RVT_START} from "../sagas";
 
 const ROOT_URL = `/api`;
 
@@ -98,7 +98,7 @@ export function logout() {
 
 export function downloadModel(path) {
     return {
-        type: DOWNLOAD_START,
+        type: DOWNLOAD_RVT_START,
         payload: {path}
     }
 }
@@ -106,6 +106,13 @@ export function downloadModel(path) {
 export function removeDownload(path) {
     return {
         type: REMOVE_DOWNLOAD,
+        payload: {path}
+    }
+}
+
+export function downloadNwc(path) {
+    return {
+        type: DOWNLOAD_NWC_START,
         payload: {path}
     }
 }

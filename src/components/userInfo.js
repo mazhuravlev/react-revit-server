@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 function getA360Link() {
     const CLIENT_ID = 'qfgik4mhtiZrGPYKMAGXVjyWHdFGqKmA';
     const REDIRECT_URL = 'http://localhost:8091/token';
-    const SCOPE = 'data:write';
+    const SCOPE = ['data:write', 'data:read','data:create'].join('%20');
     return `https://auth.autodesk.com/as/authorization.oauth2?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL}&response_type=code&scope=${SCOPE}`;
 }
 

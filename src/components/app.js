@@ -16,25 +16,19 @@ import Downloads from '../containers/downloads';
 class _App extends Component<any, any> {
     constructor(props) {
         super(props);
-        this.onSomeButtonClicked = this.onSomeButtonClicked.bind(this);
     }
 
     componentDidMount() {
         this.props.fetchModels();
         this.props.fetchHistory();
         this.onLogout = this.onLogout.bind(this);
-        if(this.props.a360.token && !this.props.a360.info) {
+        if (this.props.a360.token && !this.props.a360.info) {
             this.props.getA360Info();
         }
     }
 
     onLogout() {
         this.props.logout();
-    }
-
-    onSomeButtonClicked() {
-        const { dispatch } = this.props;
-        dispatch({type: USER_FETCH_REQUESTED, payload: {userId: 1}})
     }
 
     render() {
@@ -53,8 +47,7 @@ class _App extends Component<any, any> {
                         </div>
                         <div className="col-md-8 hi nopad">
                             <div className='my-menu'>
-                                {/*<button onClick={this.onSomeButtonClicked}>TEST</button>*/}
-                                {/*<UserInfo onLogout={this.onLogout} a360={this.props.a360}/>*/}
+                                <UserInfo onLogout={this.onLogout} a360={this.props.a360}/>
                             </div>
                             <Downloads/>
                             <div style={{padding: '8px'}}>

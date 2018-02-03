@@ -1,16 +1,26 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import Chart2 from "../components/chart2";
-import {downloadModel, fetchModelDetails} from "../actions";
+import {downloadModel, downloadNwc, fetchModelDetails} from "../actions";
 import {bindActionCreators} from "redux";
+import Viewer from "../components/viewer/Viewer";
+import axios from 'axios';
 
 function copyToClipboard(text) {
     window.prompt("Копировать: Ctrl+C, Enter", 'RSN://vpp-revit01.main.picompany.ru/' + text.replace(/\\/, '/'));
 }
 
 class ModelDetails extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
     componentWillMount() {
         if (this.props.match) this.props.fetchModelDetails(this.props.match.params.id);
+        axios.get('http://bimacadforge.azurewebsites.net/BimacadForgeHelper/GetAccessToken').then(response => {
+            this.setState({token: response.data.access_token});
+        });
     }
 
     shouldComponentUpdate() {
@@ -36,18 +46,31 @@ class ModelDetails extends Component {
                 <td>{x.length}</td>
             </tr>
         ));
+        const viewer = this.state.token ? (<div style={{height: '500px'}}>
+            <Viewer urn='urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c29ib3Ivc29ib3IucnZ0'
+                    token={this.state.token}
+            />
+        </div>) : null;
         return (
             <div className="details">
                 <h3>{details.name.replace('.rvt', '')}
-                    <span className='btn btn-my btn-sm'
-                          onClick={() => copyToClipboard(details.fullName)}>Копировать</span>
                 </h3>
-                <button className='btn btn-primary' onClick={() => this.props.downloadModel(details.fullName)}
-                disabled={details.fullName in this.props.download}>
-                    Подготовить скачивание
+                <div className="btn-group">
+                <button className='btn btn-hover btn-sm' onClick={() => this.props.downloadModel(details.fullName)}
+                        disabled={details.fullName in this.props.download}>
+                    Подготовить RVT
                 </button>
+                <button className='btn btn-hover btn-sm' onClick={() => this.props.downloadNwc(details.fullName)}
+                        disabled={details.fullName in this.props.download}>
+                    Подготовить NWC
+                </button>
+                    <button className='btn btn-hover btn-sm'
+                          onClick={() => copyToClipboard(details.fullName)}>Копировать путь</button>
+                </div>
+
                 <div>Всего синхронизаций: {details.history.length}</div>
                 <Chart2 data={chartData} color='orange'/>
+                {viewer}
                 <table className='table'>
                     <thead>
                     <tr>
@@ -70,7 +93,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({fetchModelDetails, downloadModel}, dispatch)
+    return bindActionCreators({fetchModelDetails, downloadModel, downloadNwc}, dispatch)
 }
 
 

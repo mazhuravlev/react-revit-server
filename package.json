@@ -29,7 +29,9 @@
     "jquery": "^2.2.1",
     "jsdom": "^8.1.0",
     "mocha": "^2.4.5",
+    "node-sass": "^4.7.2",
     "react-addons-test-utils": "^0.14.7",
+    "sass-loader": "^6.0.6",
     "style-loader": "^0.19.1",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
@@ -50,6 +52,7 @@
     "pciinfo": "^1.0.0",
     "query-string": "^5.0.1",
     "react": "^16.2.0",
+    "react-addons-css-transition-group": "^15.6.2",
     "react-chartjs": "^1.2.0",
     "react-dom": "^16.2.0",
     "react-motion": "^0.5.2",
