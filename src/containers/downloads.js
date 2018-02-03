@@ -2,13 +2,15 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {removeDownload} from "../actions";
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import {downloadSelector} from "../selectors/downloadSelector";
+
 const loader = require('../loader-sm.gif');
 
 
 class Download extends Component {
     render() {
-        const paths = Object.keys(this.props.download);
-        if (!paths.length) return null;
+        const {downloads} = this.props;
+        if (!downloads.length) return null;
         return (
             <div>
                 <table className='table table-condensed downloads-table'>
@@ -23,36 +25,36 @@ class Download extends Component {
                         transitionEnterTimeout={500}
                         transitionLeaveTimeout={300}
                         component="tbody">
-                    {paths.map(x => this.makeRow(x))}
+                        {downloads.map(download => this.makeRow(download))}
                     </ReactCSSTransitionGroup>
                 </table>
             </div>
         );
     }
 
-    makeRow(x) {
-        return (<tr key={x}>
-            <td>{x}</td>
-            <td>{this.getModelDownloadStateView(x, this.props.download[x])}</td>
+    makeRow(download) {
+        return (<tr key={download.path}>
+            <td>{download.path}</td>
+            <td>{this.getModelDownloadStateView(download)}</td>
         </tr>);
     }
 
-    getModelDownloadStateView(path, data) {
-        switch (data.state) {
+    getModelDownloadStateView({path, state, link}) {
+        switch (state) {
             case 'start':
-                return <img src={loader} />;
+                return <img src={loader}/>;
             case 'success':
-                return <a target='_blank' href={data.link} onClick={() => this.props.removeDownload(path)}>скачать</a>;
+                return <a target='_blank' href={link} className='btn btn-sm btn-primary' onClick={() => this.props.removeDownload(path)}>скачать</a>;
             case 'fail':
-                return <span>ошибка</span>;
+                return <span className='error'>ошибка</span>;
             default:
-                return <span>неожиданная ошибка</span>;
+                return <span className='error'>неожиданная ошибка</span>;
         }
     }
 }
 
 function mapStateToProps(state) {
-    return {download: state.download};
+    return {downloads: downloadSelector(state)};
 }
 
 export default Download = connect(mapStateToProps, {removeDownload})(Download);

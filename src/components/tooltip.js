@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 const moment = require('moment');
 
 export default function CustomTooltip({payload}) {
-    if (payload.length < 1) return null;
+    if (!payload || payload.length < 1) return null;
     const data = payload[0].payload;
     return (
         <div className="ttip">

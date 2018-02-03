@@ -1,31 +1,18 @@
-import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
-import React from 'react'
-import './Viewer.scss'
+import PropTypes from 'prop-types';
+import React from 'react';
+import './Viewer.scss';
 
 class Viewer extends React.Component {
 
-    /////////////////////////////////////////////////////////
-    //
-    //
-    /////////////////////////////////////////////////////////
     static propTypes = {
         panels: PropTypes.array
     };
 
-    /////////////////////////////////////////////////////////
-    //
-    //
-    /////////////////////////////////////////////////////////
     static defaultProps = {
         panels: [],
         style: {}
     };
 
-    /////////////////////////////////////////////////////////
-    //
-    //
-    /////////////////////////////////////////////////////////
     constructor() {
         super();
         this.state = {showLoader: true};
@@ -45,76 +32,37 @@ class Viewer extends React.Component {
         this.setState({timeout});
     }
 
-    componentWillReceiveProps(props) {
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return true;
-    }
-
     componentDidUpdate() {
-        console.log('viewer did update');
         if (this.viewer && this.viewer.impl) {
-
             if (this.viewerContainer.offsetHeight !== this.height ||
                 this.viewerContainer.offsetWidth !== this.width) {
-
                 this.height = this.viewerContainer.offsetHeight;
                 this.width = this.viewerContainer.offsetWidth;
-
                 this.viewer.resize();
-                console.log('resize');
             }
         }
-
         this.props.panels.map((panel) => {
-
             panel.emit('update');
         })
     }
 
-    /////////////////////////////////////////////////////////
-    // Component will unmount so we can destroy the viewer to avoid
-    // memory leaks
-    //
-    /////////////////////////////////////////////////////////
     componentWillUnmount() {
         if(this.state.timeout) clearTimeout(this.state.timeout);
         if (this.viewer && this.viewer.impl.selector) {
-            console.log('destroy viewer');
-//            if (this.viewer) {
-
             this.viewer.tearDown();
             this.viewer.finish();
             this.viewer = null
-            //          }
         }
     }
 
-    /////////////////////////////////////////////////////////
-    // Render component, resize the viewer if exists
-    //
-    /////////////////////////////////////////////////////////
     render() {
-
-        // const panels = this.props.panels.map((panel) => {
-        //
-        // });
-
-        //     return panel.render();
         const viewerClass = 'viewer-loader ' + (this.state.showLoader ? 'active' : 'hidden');
-        console.log('render', viewerClass);
         return (
             <div className="viewer-app-container">
                 <div className={viewerClass}/>
                 <div ref={(div) => this.viewerContainer = div}
                      className="viewer-container"
                 />
-
-                {/*<div className="viewer-panels-container">*/}
-                {/*{panels}*/}
-                {/*</div>*/}
-
             </div>
         );
     }
@@ -133,12 +81,11 @@ class Viewer extends React.Component {
             sharedPropertyDbPath: doc.getPropertyDbPath()
         };
         this.viewer = new Autodesk.Viewing.Private.GuiViewer3D(this.viewerContainer);
-        console.log('start viewer');
         this.viewer.start(svfUrl, modelOptions, data => this.onLoadModelSuccess(data), e => this.onLoadModelError(e));
     }
 
     onDocumentLoadFailure(viewerErrorCode) {
-
+        console.error(viewerErrorCode);
     }
 
     onLoadModelSuccess(data) {
@@ -150,4 +97,4 @@ class Viewer extends React.Component {
     }
 }
 
-export default Viewer
+export default Viewer;

@@ -67,6 +67,7 @@
     "redux-promise": "^0.5.3",
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
+    "reselect": "^3.0.1",
     "urlencode": "^1.1.0",
     "uuid": "^3.2.1"
   }

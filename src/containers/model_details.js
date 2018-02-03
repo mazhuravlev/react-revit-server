@@ -5,6 +5,7 @@ import {downloadModel, downloadNwc, fetchModelDetails} from "../actions";
 import {bindActionCreators} from "redux";
 import Viewer from "../components/viewer/Viewer";
 import axios from 'axios';
+import {chartSelector} from "../selectors/chartSelector";
 
 function copyToClipboard(text) {
     window.prompt("Копировать: Ctrl+C, Enter", 'RSN://vpp-revit01.main.picompany.ru/' + text.replace(/\\/, '/'));
@@ -23,10 +24,6 @@ class ModelDetails extends Component {
         });
     }
 
-    shouldComponentUpdate() {
-        return true;
-    }
-
     componentWillReceiveProps(props) {
         if (this.modelId === props.match.params.id && props.details) {
             return;
@@ -36,10 +33,9 @@ class ModelDetails extends Component {
     }
 
     render() {
-        const details = this.props.details;
+        const {details, chartData} = this.props;
         if (!details) return (<div className='loader'/>);
 
-        const chartData = details.processedHistory;
         const users = _.sortBy(Object.values(_.groupBy(details.history, 'user')), x => -x.length).map(x => (
             <tr key={x[0].user}>
                 <td>{x[0].user}</td>
@@ -51,6 +47,7 @@ class ModelDetails extends Component {
                     token={this.state.token}
             />
         </div>) : null;
+        const chart = chartData ? <Chart2 chartData={chartData} color='orange'/> : null;
         return (
             <div className="details">
                 <h3>{details.name.replace('.rvt', '')}
@@ -69,7 +66,7 @@ class ModelDetails extends Component {
                 </div>
 
                 <div>Всего синхронизаций: {details.history.length}</div>
-                <Chart2 data={chartData} color='orange'/>
+                {chart}
                 {viewer}
                 <table className='table'>
                     <thead>
@@ -88,7 +85,8 @@ class ModelDetails extends Component {
 function mapStateToProps(state) {
     return {
         details: state.details,
-        download: state.download
+        download: state.download,
+        chartData: chartSelector(state)
     }
 }
 

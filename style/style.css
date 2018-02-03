@@ -163,3 +163,7 @@ table.table-condensed td, table.table-condensed th {
     opacity: 0.01;
     transition: opacity 300ms ease-in;
 }
+
+span.error {
+    color: darkred;
+}

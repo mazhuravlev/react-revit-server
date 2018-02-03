@@ -2,24 +2,7 @@ import React from 'react';
 import {CartesianGrid, ComposedChart, Legend, Line, Scatter, Tooltip, XAxis, YAxis} from 'recharts';
 import CustomTooltip from "./tooltip";
 
-const moment = require('moment');
-
-export default function Chart2({data}) {
-    if (data.length < 1) return (
-        <div className='chart'>
-            <strong>Слишком мало синхронизаций</strong>
-        </div>
-    );
-    const chartData = data.map(x => ({
-        name: 'a',
-        sync: x.count,
-        year: x.year,
-        week: x.week,
-        users: x.users,
-        size: Math.round(x.modelSize / 1024 / 1024),
-        date: moment().year(x.year).week(x.week),
-        syncs: x.syncs
-    }));
+export default function Chart2({chartData}) {
     return (
         <div className='chart'>
             <ComposedChart width={window.innerWidth / 12 * 8 - 40} height={400} data={chartData}>
