@@ -6,6 +6,9 @@ import {bindActionCreators} from "redux";
 import Viewer from "../components/viewer/Viewer";
 import axios from 'axios';
 import {chartSelector} from "../selectors/chartSelector";
+import {STATE_FAIL} from "../reducers/reducer_download";
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
 
 function copyToClipboard(text) {
     window.prompt("Копировать: Ctrl+C, Enter", 'RSN://vpp-revit01.main.picompany.ru/' + text.replace(/\\/, '/'));
@@ -18,24 +21,37 @@ class ModelDetails extends Component {
     }
 
     componentWillMount() {
-        if (this.props.match) this.props.fetchModelDetails(this.props.match.params.id);
+        this.props.fetchModelDetails(this.props.match.params.id);
         axios.get('http://bimacadforge.azurewebsites.net/BimacadForgeHelper/GetAccessToken').then(response => {
             this.setState({token: response.data.access_token});
-        });
+        }).catch(e => console.error('Token error', e));
     }
 
-    componentWillReceiveProps(props) {
-        if (this.modelId === props.match.params.id && props.details) {
-            return;
+    componentWillReceiveProps({details, match}) {
+        if (!details || details._id !== match.params.id) {
+            if (!this.state.loading) this.setState({loading: match.params.id});
+            if (this.state.loading !== match.params.id) this.props.fetchModelDetails(match.params.id);
+        } else if (this.state.loading) {
+            this.setState({loading: false});
         }
-        this.props.fetchModelDetails(props.match.params.id);
-        this.modelId = props.match.params.id;
     }
 
     render() {
         const {details, chartData} = this.props;
-        if (!details) return (<div className='loader'/>);
+        const isLoading = !details || this.state.loading;
+        const detailsView = isLoading ? null : this.getDetailsView(details, chartData);
+        const loaderView = (
+            <div key="loader" className='loader'>
+            </div>
+        );
+        return (
+                <div>
+                    {isLoading ? loaderView : detailsView}
+                </div>
+        );
+    }
 
+    getDetailsView(details, chartData) {
         const users = _.sortBy(Object.values(_.groupBy(details.history, 'user')), x => -x.length).map(x => (
             <tr key={x[0].user}>
                 <td>{x[0].user}</td>
@@ -49,20 +65,22 @@ class ModelDetails extends Component {
         </div>) : null;
         const chart = chartData ? <Chart2 chartData={chartData} color='orange'/> : null;
         return (
-            <div className="details">
+            <div className="details" key={`details_${details.fullName}`}>
+                {0}
                 <h3>{details.name.replace('.rvt', '')}
                 </h3>
                 <div className="btn-group">
-                <button className='btn btn-hover btn-sm' onClick={() => this.props.downloadModel(details.fullName)}
-                        disabled={details.fullName in this.props.download}>
-                    Подготовить RVT
-                </button>
-                <button className='btn btn-hover btn-sm' onClick={() => this.props.downloadNwc(details.fullName)}
-                        disabled={details.fullName in this.props.download}>
-                    Подготовить NWC
-                </button>
+                    <button className='btn btn-hover btn-sm' onClick={() => this.props.downloadModel(details.fullName)}
+                            disabled={this.canDownload(details)}>
+                        Подготовить RVT
+                    </button>
+                    <button className='btn btn-hover btn-sm' onClick={() => this.props.downloadNwc(details.fullName)}
+                            disabled={this.canDownload(details)}>
+                        Подготовить NWC
+                    </button>
                     <button className='btn btn-hover btn-sm'
-                          onClick={() => copyToClipboard(details.fullName)}>Копировать путь</button>
+                            onClick={() => copyToClipboard(details.fullName)}>Копировать путь
+                    </button>
                 </div>
 
                 <div>Всего синхронизаций: {details.history.length}</div>
@@ -79,6 +97,11 @@ class ModelDetails extends Component {
                 </table>
             </div>
         );
+    }
+
+    canDownload({fullName}) {
+        const {download} = this.props;
+        return fullName in download && download[fullName].state !== STATE_FAIL;
     }
 }
 

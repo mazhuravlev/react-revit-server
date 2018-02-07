@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {removeDownload} from "../actions";
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import {downloadSelector} from "../selectors/downloadSelector";
+import {STATE_FAIL, STATE_START, STATE_SUCCESS} from "../reducers/reducer_download";
 
 const loader = require('../loader-sm.gif');
 
@@ -41,11 +42,11 @@ class Download extends Component {
 
     getModelDownloadStateView({path, state, link}) {
         switch (state) {
-            case 'start':
+            case STATE_START:
                 return <img src={loader}/>;
-            case 'success':
+            case STATE_SUCCESS:
                 return <a target='_blank' href={link} className='btn btn-sm btn-primary' onClick={() => this.props.removeDownload(path)}>скачать</a>;
-            case 'fail':
+            case STATE_FAIL:
                 return <span className='error'>ошибка</span>;
             default:
                 return <span className='error'>неожиданная ошибка</span>;

@@ -12,6 +12,8 @@ import Token from '../containers/token';
 import UserInfo from "./userInfo";
 import {USER_FETCH_REQUESTED} from "../sagas";
 import Downloads from '../containers/downloads';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
 
 class _App extends Component<any, any> {
     constructor(props) {
@@ -53,7 +55,12 @@ class _App extends Component<any, any> {
                             <div style={{padding: '8px'}}>
                                 <Route exact path='/' component={History}/>
                                 <Route path='/token' component={Token}/>
-                                <Route path='/model/:id' component={ModelDetails}/>
+                                <ReactCSSTransitionGroup
+                                    transitionName="details"
+                                    transitionEnterTimeout={500}
+                                    transitionLeaveTimeout={0}>
+                                <Route key={location} location={location} path='/model/:id' component={ModelDetails}/>
+                                </ReactCSSTransitionGroup>
                             </div>
                         </div>
                     </div>

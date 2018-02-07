@@ -9,8 +9,12 @@ export const DOWNLOAD_NWC_START = 'DOWNLOAD_NWC_START';
 export const DOWNLOAD_NWC_SUCCESS = 'DOWNLOAD_NWC_SUCCESS';
 export const DOWNLOAD_NWC_FAIL = 'DOWNLOAD_NWC_FAIL';
 
-const DOWNLOAD_PATH = 'http://vpp-revit01.main.picompany.ru:3000/download';
-const DOWNLOAD_NWC_PATH = 'http://vpp-revit01.main.picompany.ru:3000/convertNwc';
+const BASE_URL = 'http://vpp-revit01.main.picompany.ru:3000';
+const RVT_PATH = BASE_URL;
+const NWC_PATH = BASE_URL;
+
+const DOWNLOAD_PATH = RVT_PATH + '/download';
+const DOWNLOAD_NWC_PATH = NWC_PATH + '/convertNwc';
 
 function* download(action) {
     try {
@@ -20,7 +24,7 @@ function* download(action) {
             payload: {...response.data, link: `${DOWNLOAD_PATH}/${response.data.guid}`}
         });
     } catch (e) {
-        yield put({type: DOWNLOAD_RVT_FAIL, message: e.message});
+        yield put({type: DOWNLOAD_RVT_FAIL, payload: {path: action.payload.path, message: e.message}});
     }
 }
 
@@ -32,14 +36,14 @@ function* downloadNwc(action) {
             payload: {...response.data, link: `${DOWNLOAD_NWC_PATH}/${response.data.guid}`}
         });
     } catch (e) {
-        yield put({type: DOWNLOAD_NWC_FAIL, message: e.message});
+        yield put({type: DOWNLOAD_NWC_FAIL, payload: {path: action.payload.path, message: e.message}});
     }
 }
 
 
 export default function* mySaga() {
     yield [
+        takeEvery(DOWNLOAD_NWC_START, downloadNwc),
         takeEvery(DOWNLOAD_RVT_START, download),
-        takeEvery(DOWNLOAD_NWC_START, downloadNwc)
     ];
 }
