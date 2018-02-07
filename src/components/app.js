@@ -55,12 +55,7 @@ class _App extends Component<any, any> {
                             <div style={{padding: '8px'}}>
                                 <Route exact path='/' component={History}/>
                                 <Route path='/token' component={Token}/>
-                                <ReactCSSTransitionGroup
-                                    transitionName="details"
-                                    transitionEnterTimeout={500}
-                                    transitionLeaveTimeout={0}>
                                 <Route key={location} location={location} path='/model/:id' component={ModelDetails}/>
-                                </ReactCSSTransitionGroup>
                             </div>
                         </div>
                     </div>

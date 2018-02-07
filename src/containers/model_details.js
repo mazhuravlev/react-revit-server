@@ -28,9 +28,12 @@ class ModelDetails extends Component {
     }
 
     componentWillReceiveProps({details, match}) {
+        console.log('receive props');
         if (!details || details._id !== match.params.id) {
-            if (!this.state.loading) this.setState({loading: match.params.id});
-            if (this.state.loading !== match.params.id) this.props.fetchModelDetails(match.params.id);
+            if (!this.state.loading) {
+                this.setState({loading: match.params.id});
+                this.props.fetchModelDetails(match.params.id);
+            }
         } else if (this.state.loading) {
             this.setState({loading: false});
         }
@@ -45,9 +48,9 @@ class ModelDetails extends Component {
             </div>
         );
         return (
-                <div>
-                    {isLoading ? loaderView : detailsView}
-                </div>
+            <div>
+                {isLoading ? loaderView : detailsView}
+            </div>
         );
     }
 
@@ -66,7 +69,6 @@ class ModelDetails extends Component {
         const chart = chartData ? <Chart2 chartData={chartData} color='orange'/> : null;
         return (
             <div className="details" key={`details_${details.fullName}`}>
-                {0}
                 <h3>{details.name.replace('.rvt', '')}
                 </h3>
                 <div className="btn-group">
