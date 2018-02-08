@@ -14,6 +14,8 @@ import {USER_FETCH_REQUESTED} from "../sagas";
 import Downloads from '../containers/downloads';
 import {v4 as uuid} from 'uuid';
 import axios from "axios/index";
+const eio = require('engine.io-client');
+
 
 const GET_TOKEN = false;
 
@@ -37,6 +39,14 @@ class _App extends Component<any, any> {
                 this.props.setToken(response.data.access_token);
             }).catch(e => console.error('Token error', e));
         }
+
+        const socket = eio('ws://localhost:9122');
+        socket.on('open', function(){
+            socket.on('message', function(data){
+                console.log(data);
+            });
+            socket.on('close', function(){});
+        });
     }
 
     onLogout() {

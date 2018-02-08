@@ -46,7 +46,8 @@ module.exports = {
         historyApiFallback: true,
         contentBase: './',
         proxy: {
-            "/api": "http://localhost:9121"
+            "/api": "http://localhost:9121",
+            "/engine.io": "http://localhost:9121"
         }
     }
 };
