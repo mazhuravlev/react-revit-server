@@ -4,10 +4,9 @@ import Chart2 from "../components/chart2";
 import {downloadModel, downloadNwc, fetchModelDetails} from "../actions";
 import {bindActionCreators} from "redux";
 import Viewer from "../components/viewer/Viewer";
-import axios from 'axios';
 import {chartSelector} from "../selectors/chartSelector";
 import {STATE_FAIL} from "../reducers/reducer_download";
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import {tokenSelector} from "../selectors/tokenSelector";
 
 
 function copyToClipboard(text) {
@@ -22,13 +21,9 @@ class ModelDetails extends Component {
 
     componentWillMount() {
         this.props.fetchModelDetails(this.props.match.params.id);
-        axios.get('http://bimacadforge.azurewebsites.net/BimacadForgeHelper/GetAccessToken').then(response => {
-            this.setState({token: response.data.access_token});
-        }).catch(e => console.error('Token error', e));
     }
 
     componentWillReceiveProps({details, match}) {
-        console.log('receive props');
         if (!details || details._id !== match.params.id) {
             if (!this.state.loading) {
                 this.setState({loading: match.params.id});
@@ -61,9 +56,9 @@ class ModelDetails extends Component {
                 <td>{x.length}</td>
             </tr>
         ));
-        const viewer = this.state.token ? (<div style={{height: '500px'}}>
+        const viewer = this.props.token ? (<div style={{height: '500px'}}>
             <Viewer urn='urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c29ib3Ivc29ib3IucnZ0'
-                    token={this.state.token}
+                    token={this.props.token}
             />
         </div>) : null;
         const chart = chartData ? <Chart2 chartData={chartData} color='orange'/> : null;
@@ -111,7 +106,8 @@ function mapStateToProps(state) {
     return {
         details: state.details,
         download: state.download,
-        chartData: chartSelector(state)
+        chartData: chartSelector(state),
+        token: tokenSelector(state),
     }
 }
 

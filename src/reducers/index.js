@@ -7,6 +7,7 @@ import reducerSettings from "./reducer_settings";
 import reducerModelsWeek from "./reducer_modelsWeek";
 import reducerA360 from './reducer_a360';
 import reducerDownload from './reducer_download';
+import reducerUser from './reducer_user';
 
 const rootReducer = combineReducers({
     models: reducerModels,
@@ -16,7 +17,8 @@ const rootReducer = combineReducers({
     settings: reducerSettings,
     modelsWeek: reducerModelsWeek,
     a360: reducerA360,
-    download: reducerDownload
+    download: reducerDownload,
+    user: reducerUser,
 });
 
 export default rootReducer;

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {fetchHistory, fetchModels, getA360Info, logout} from "../actions";
+import {fetchHistory, fetchModels, getA360Info, logout, setToken, setUserId} from "../actions";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ModelDetails from "../containers/model_details";
@@ -12,8 +12,10 @@ import Token from '../containers/token';
 import UserInfo from "./userInfo";
 import {USER_FETCH_REQUESTED} from "../sagas";
 import Downloads from '../containers/downloads';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import {v4 as uuid} from 'uuid';
+import axios from "axios/index";
 
+const GET_TOKEN = false;
 
 class _App extends Component<any, any> {
     constructor(props) {
@@ -26,6 +28,14 @@ class _App extends Component<any, any> {
         this.onLogout = this.onLogout.bind(this);
         if (this.props.a360.token && !this.props.a360.info) {
             this.props.getA360Info();
+        }
+        const userId = localStorage.getItem('userId') || uuid();
+        localStorage.setItem('userId', userId);
+        this.props.setUserId(userId);
+        if(GET_TOKEN) {
+            axios.get('http://bimacadforge.azurewebsites.net/BimacadForgeHelper/GetAccessToken').then(response => {
+                this.props.setToken(response.data.access_token);
+            }).catch(e => console.error('Token error', e));
         }
     }
 
@@ -74,7 +84,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    const actions = bindActionCreators({fetchModels, fetchHistory, logout, getA360Info}, dispatch);
+    const actions = bindActionCreators({fetchModels, fetchHistory, logout, getA360Info, setUserId, setToken}, dispatch);
     return {...actions, dispatch};
 }
 
