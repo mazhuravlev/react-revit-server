@@ -10,7 +10,7 @@ const HistorySchema = Schema({
     user: String,
     modelSize: Number,
     date: Date,
-    model: { type: ObjectId, ref: 'model' }
+    model: {type: ObjectId, ref: 'model'}
 });
 const History = Mongoose.model('history', HistorySchema);
 
@@ -20,8 +20,24 @@ const ModelSchema = Schema({
     fullName: String,
     weekSync: Number,
     lastSync: Date,
-    history: [{ type: ObjectId, ref: 'history' }]
+    history: [{type: ObjectId, ref: 'history'}]
 });
 const Model = Mongoose.model('model', ModelSchema);
 
-module.exports = {Model, History, ObjectId};
+const ExportRvtTaskSchema = Schema({
+    id: String,
+    serverModelPath: String,
+    owner: String,
+    status: String
+});
+const ExportRvtTask = Mongoose.model(ExportRvtTaskSchema);
+
+const ConvertNwcTaskSchema = Schema({
+    id: String,
+    rvtModelPath: String,
+    owner: String,
+    status: String
+});
+const ConvertNwcTask = Mongoose.model(ConvertNwcTaskSchema);
+
+module.exports = {Model, History, ExportRvtTask, ConvertNwcTask, ObjectId};
