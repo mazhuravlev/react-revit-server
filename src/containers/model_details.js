@@ -19,11 +19,18 @@ class ModelDetails extends Component {
         this.state = {};
     }
 
-    componentWillMount() {
-        this.props.fetchModelDetails(this.props.match.params.id);
+    componentDidMount() {
+        this.loadDetails(this.props);
     }
 
-    componentWillReceiveProps({details, match}) {
+    componentWillMount() {
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.loadDetails(newProps);
+    }
+
+    loadDetails({details, match}) {
         if (!details || details._id !== match.params.id) {
             if (!this.state.loading) {
                 this.setState({loading: match.params.id});

@@ -65,8 +65,6 @@ export function setToken(tokenData) {
     }
 }
 
-
-
 export function resetToken(token) {
     return {
         type: RESET_TOKEN,
