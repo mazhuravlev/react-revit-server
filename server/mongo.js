@@ -26,7 +26,9 @@ const Model = Mongoose.model('model', ModelSchema);
 
 const ExportRvtTaskSchema = Schema({
     id: String,
+    date: Date,
     serverModelPath: String,
+    resultPath: String,
     owner: String,
     status: String
 });
@@ -34,7 +36,9 @@ const ExportRvtTask = Mongoose.model(ExportRvtTaskSchema);
 
 const ConvertNwcTaskSchema = Schema({
     id: String,
+    date: Date,
     rvtModelPath: String,
+    resultPath: String,
     owner: String,
     status: String
 });

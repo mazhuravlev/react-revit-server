@@ -7,17 +7,11 @@ const {Model, History} = require('./mongo');
 const Mongoose = require('mongoose');
 
 const PORT = 9121;
-const SOCKET_PORT = PORT+1;
+const SOCKET_PORT = PORT + 1;
 
 const app = new Koa();
 const router = new Router();
 const api = new Router();
-
-// const server = require('http').createServer(app.callback());
-// const io = require('engine.io')(server);
-// io.on('connection', function(socket){
-//     console.log('[SOCKET]', socket);
-// });
 
 router.get('/models', async ctx => {
     const cursor = await Mongoose.connection.db.collection('models').aggregate([
@@ -49,7 +43,7 @@ const engine = require('engine.io');
 const server = engine.listen(SOCKET_PORT);
 console.log(`[ENGINE.IO] Listening on ${SOCKET_PORT}`);
 
-server.on('connection', function(socket){
+server.on('connection', function (socket) {
     socket.send('utf 8 string');
     socket.send(new Buffer([0, 1, 2, 3, 4, 5])); // binary data
 });
