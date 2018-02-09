@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ModelDetails from "../containers/model_details";
 import History from "../containers/history";
-import {BrowserRouter, Link, NavLink, Route} from "react-router-dom";
+import {BrowserRouter, NavLink, Route} from "react-router-dom";
 import ListSelector from "../containers/list-selector";
 import ModelListWeek from "../containers/model_list_week";
 import ModelList from "../containers/model_list";
@@ -16,10 +16,9 @@ import {v4 as uuid} from 'uuid';
 import axios from "axios/index";
 const eio = require('engine.io-client');
 
-
 const GET_TOKEN = false;
 
-class _App extends Component<any, any> {
+class App extends Component {
     constructor(props) {
         super(props);
     }
@@ -99,5 +98,4 @@ function mapDispatchToProps(dispatch) {
     return {...actions, dispatch};
 }
 
-const App = connect(mapStateToProps, mapDispatchToProps)(_App);
-export default App;
+export default App = connect(mapStateToProps, mapDispatchToProps)(App);
