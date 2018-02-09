@@ -25,15 +25,16 @@ class _App extends Component<any, any> {
     }
 
     componentDidMount() {
+        const userId = localStorage.getItem('userId') || uuid();
+        this.props.setUserId(userId);
+        localStorage.setItem('userId', userId);
         this.props.fetchModels();
         this.props.fetchHistory();
         this.onLogout = this.onLogout.bind(this);
         if (this.props.a360.token && !this.props.a360.info) {
             this.props.getA360Info();
         }
-        const userId = localStorage.getItem('userId') || uuid();
-        localStorage.setItem('userId', userId);
-        this.props.setUserId(userId);
+
         if(GET_TOKEN) {
             axios.get('http://bimacadforge.azurewebsites.net/BimacadForgeHelper/GetAccessToken').then(response => {
                 this.props.setToken(response.data.access_token);
