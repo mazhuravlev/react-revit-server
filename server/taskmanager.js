@@ -38,10 +38,10 @@ class TaskManager {
         this.completeNwcChannel.assertExchange(this.COMPLETE_NWCS_EXCANGE, 'direct', {durable: true});
         const q = await this.completeNwcChannel.assertQueue('completeNwc', {});
         this.completeNwcChannel.bindQueue(q.queue, this.COMPLETE_NWCS_EXCANGE, 'completeNwc');
-        this.completeNwcChannel.consume(q.queue, msg => {
+        this.completeNwcChannel.consume(q.queue, async(msg) => {
             this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
-            const task = this.getNwcTask(msg);
+            const task = await this.getNwcTask(msg);
             this.sendCompleteTask(task);
         });
 
@@ -49,10 +49,10 @@ class TaskManager {
         this.completeRvtChannel.assertExchange(this.COMPLETE_RVTS_EXCANGE, 'direct', {durable: true});
         const q1 = await this.completeRvtChannel.assertQueue('completeRvt', {});
         this.completeRvtChannel.bindQueue(q1.queue, this.COMPLETE_RVTS_EXCANGE, 'completeRvt');
-        this.completeRvtChannel.consume(q1.queue, msg => {
+        this.completeRvtChannel.consume(q1.queue, async(msg) => {
             this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
-            const task = this.getRvtTask(msg);
+            const task = await this.getRvtTask(msg);
             this.sendCompleteTask(task);
         });
     }
@@ -156,7 +156,7 @@ class TaskManager {
     }
 
     sendCompleteTask(task) {
-        const socket = this.clients[task.id];
+        const socket = this.clients[task.owner];
         if (socket) {
             socket.send(JSON.stringify(task));
         }

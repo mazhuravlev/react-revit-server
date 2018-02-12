@@ -9,16 +9,16 @@ export const DOWNLOAD_NWC_START = 'DOWNLOAD_NWC_START';
 export const DOWNLOAD_NWC_SUCCESS = 'DOWNLOAD_NWC_SUCCESS';
 export const DOWNLOAD_NWC_FAIL = 'DOWNLOAD_NWC_FAIL';
 
-const BASE_URL = 'http://vpp-revit01.main.picompany.ru:3000';
+const BASE_URL = '/api';
 const RVT_PATH = BASE_URL;
 const NWC_PATH = BASE_URL;
 
-const DOWNLOAD_PATH = RVT_PATH + '/download';
+const DOWNLOAD_PATH = RVT_PATH + '/exportRvt';
 const DOWNLOAD_NWC_PATH = NWC_PATH + '/convertNwc';
 
 function* download(action) {
     try {
-        const response = yield call(axios.post, DOWNLOAD_PATH, {path: action.payload.path});
+        const response = yield call(axios.post, DOWNLOAD_PATH, {server: 'vpp-revit01', serverModelPath: action.payload.path});
         yield put({
             type: DOWNLOAD_RVT_SUCCESS,
             payload: {...response.data, link: `${DOWNLOAD_PATH}/${response.data.guid}`}
@@ -30,7 +30,7 @@ function* download(action) {
 
 function* downloadNwc(action) {
     try {
-        const response = yield call(axios.post, DOWNLOAD_NWC_PATH, {path: action.payload.path});
+        const response = yield call(axios.post, DOWNLOAD_NWC_PATH, {server: 'vpp-revit01', serverModelPath: action.payload.path});
         yield put({
             type: DOWNLOAD_NWC_SUCCESS,
             payload: {...response.data, link: `${DOWNLOAD_NWC_PATH}/${response.data.guid}`}
