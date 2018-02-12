@@ -31,16 +31,22 @@ router.get('/models', async ctx => {
     ]);
     ctx.body = await cursor.toArray();
 }).post('/exportRvt', async ctx => {
-    const {server, owner, serverModelPath} = ctx.request.body;
+    const owner = ctx.state.user.id;
+    const {server, serverModelPath} = ctx.request.body;
     ctx.body = taskManager.exportRvt(server, owner, serverModelPath, true);
 }).post('/convertNwc', async ctx => {
-    const {server, owner, serverModelPath} = ctx.request.body;
+    const owner = ctx.state.user.id;
+    const {server, serverModelPath} = ctx.request.body;
     ctx.body = taskManager.exportRvt(server, owner, serverModelPath, false);
 });
-
-
 api.use('/api', router.routes());
 
+app.use(async (ctx, next) => {
+    const authHeader = ctx.headers['authorization'];
+    if(authHeader) {
+        ctx.state.user = {id: authHeader.replace('Bearer ', '')};
+    }
+});
 app.use(cors());
 app.use(logger());
 app.use(bodyparser());

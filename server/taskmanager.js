@@ -9,7 +9,7 @@ const {ExportRvtTask, ConvertNwcTask} = require('./mongo');
 nconf.file('config.json');
 nconf.required(['rvtResultPath', 'nwcResultPath']);
 const rvtResutlPath = nconf.get('rvtResultPath');
-const nwcResultath = nconf.get('nwcResultPath')
+const nwcResultath = nconf.get('nwcResultPath');
 
 class TaskManager {
 
