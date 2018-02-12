@@ -7,11 +7,24 @@ import Viewer from "../components/viewer/Viewer";
 import {chartSelector} from "../selectors/chartSelector";
 import {STATE_FAIL} from "../reducers/reducer_download";
 import {tokenSelector} from "../selectors/tokenSelector";
+import ReactTable from "react-table";
+import 'react-table/react-table.css';
+import TABLE_SETTINGS from '../tableSettings';
+import {detailsHistorySelector} from "../selectors/detailsHistorySelector";
 
 
 function copyToClipboard(text) {
     window.prompt("Копировать: Ctrl+C, Enter", 'RSN://vpp-revit01.main.picompany.ru/' + text.replace(/\\/, '/'));
 }
+
+const userColumns = [{
+    Header: 'Пользователь',
+    accessor: 'name'
+}, {
+    Header: 'Синхронизаций',
+    accessor: 'count'
+}];
+
 
 class ModelDetails extends Component {
     constructor(props) {
@@ -19,11 +32,18 @@ class ModelDetails extends Component {
         this.state = {};
     }
 
-    componentWillMount() {
-        this.props.fetchModelDetails(this.props.match.params.id);
+    componentDidMount() {
+        this.loadDetails(this.props);
     }
 
-    componentWillReceiveProps({details, match}) {
+    componentWillMount() {
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.loadDetails(newProps);
+    }
+
+    loadDetails({details, match}) {
         if (!details || details._id !== match.params.id) {
             if (!this.state.loading) {
                 this.setState({loading: match.params.id});
@@ -37,29 +57,13 @@ class ModelDetails extends Component {
     render() {
         const {details, chartData} = this.props;
         const isLoading = !details || this.state.loading;
-        const detailsView = isLoading ? null : this.getDetailsView(details, chartData);
-        const loaderView = (
-            <div key="loader" className='loader'>
-            </div>
-        );
-        return (
-            <div>
-                {isLoading ? loaderView : detailsView}
-            </div>
-        );
+        return isLoading ? <div key="loader" className='loader'/> :
+            <div>{this.getDetailsView(details, chartData)}</div>;
     }
 
     getDetailsView(details, chartData) {
-        const users = _.sortBy(Object.values(_.groupBy(details.history, 'user')), x => -x.length).map(x => (
-            <tr key={x[0].user}>
-                <td>{x[0].user}</td>
-                <td>{x.length}</td>
-            </tr>
-        ));
         const viewer = this.props.token ? (<div style={{height: '500px'}}>
-            <Viewer urn='urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c29ib3Ivc29ib3IucnZ0'
-                    token={this.props.token}
-            />
+            <Viewer urn='urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c29ib3Ivc29ib3IucnZ0' token={this.props.token}/>
         </div>) : null;
         const chart = chartData ? <Chart2 chartData={chartData} color='orange'/> : null;
         return (
@@ -83,15 +87,7 @@ class ModelDetails extends Component {
                 <div>Всего синхронизаций: {details.history.length}</div>
                 {chart}
                 {viewer}
-                <table className='table'>
-                    <thead>
-                    <tr>
-                        <th>Пользователь</th>
-                        <th>Синхронизаций</th>
-                    </tr>
-                    </thead>
-                    <tbody>{users}</tbody>
-                </table>
+                <ReactTable data={this.props.userData} columns={userColumns} defaultPageSize={5} {...TABLE_SETTINGS}/>
             </div>
         );
     }
@@ -104,6 +100,7 @@ class ModelDetails extends Component {
 
 function mapStateToProps(state) {
     return {
+        userData: detailsHistorySelector(state),
         details: state.details,
         download: state.download,
         chartData: chartSelector(state),

@@ -64,6 +64,7 @@
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-sparklines": "^1.7.0",
+    "react-table": "^6.7.6",
     "react-toggle": "^4.0.2",
     "react-treebeard": "^2.1.0",
     "recharts": "^1.0.0-beta.9",

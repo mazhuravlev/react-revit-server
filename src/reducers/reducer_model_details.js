@@ -26,7 +26,7 @@ function processHistory(_history) {
 export default function reducerModelDetails(state = null, action) {
     switch(action.type) {
         case BEGIN_FETCH_MODEL_DETAILS:
-            return null;
+            return state;
         case FETCH_MODEL_DETAILS:
             return {...action.payload.data, processedHistory: processHistory(action.payload.data.history)};
         default:

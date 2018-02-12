@@ -1,26 +1,21 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import ReactTable from "react-table";
+import 'react-table/react-table.css';
+import TABLE_SETTINGS from '../tableSettings';
+
+const columns = [{
+    Header: 'Пользователь',
+    accessor: '_id'
+}, {
+    Header: 'Синхронизаций',
+    accessor: 'count'
+}];
 
 class _History extends Component {
     render() {
-        const data = this.props.history.map(x => (
-            <tr key={x._id}>
-                <td>{x._id}</td>
-                <td>{x.count}</td>
-            </tr>
-        ));
         return (
-            <table className='table table-condensed'>
-                <thead>
-                <tr>
-                    <th>Пользователь</th>
-                    <th>Синхронизаций</th>
-                </tr>
-                </thead>
-                <tbody>
-                {data}
-                </tbody>
-            </table>
+            <ReactTable data={this.props.history} columns={columns} {...TABLE_SETTINGS} />
         );
     }
 }

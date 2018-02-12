@@ -65,8 +65,6 @@ export function setToken(tokenData) {
     }
 }
 
-
-
 export function resetToken(token) {
     return {
         type: RESET_TOKEN,
@@ -120,6 +118,7 @@ export function downloadNwc(path) {
 
 export const SET_USER_ID = 'SET_USER_ID';
 export function setUserId(id) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${id}`;
     return {
         type: SET_USER_ID,
         payload: id
