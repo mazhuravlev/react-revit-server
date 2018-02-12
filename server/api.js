@@ -46,6 +46,7 @@ app.use(async (ctx, next) => {
     if(authHeader) {
         ctx.state.user = {id: authHeader.replace('Bearer ', '')};
     }
+    await next();
 });
 app.use(cors());
 app.use(logger());
