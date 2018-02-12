@@ -1,3 +1,5 @@
+import {fetchHistory, fetchModels, setUserId} from "./actions";
+
 require("babel-core/register");
 require("babel-polyfill");
 
@@ -12,11 +14,20 @@ import mySaga from './sagas';
 import App from './components/app';
 import reducers from './reducers';
 
+const USER_ID_KEY = 'userId';
+
 const sagaMiddleware = createSagaMiddleware();
 const createStoreWithMiddleware = applyMiddleware(sagaMiddleware, ReduxPromise, ReduxThunk)(createStore);
 
+const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+store.dispatch(fetchModels());
+store.dispatch(fetchHistory());
+const userId = localStorage.getItem(USER_ID_KEY) || uuid();
+store.dispatch(setUserId(userId));
+localStorage.setItem(USER_ID_KEY, userId);
+
 ReactDOM.render(
-  <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>
+  <Provider store={store}>
     <App />
   </Provider>
   ,document.querySelector('#container'));

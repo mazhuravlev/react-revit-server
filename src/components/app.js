@@ -14,6 +14,7 @@ import {USER_FETCH_REQUESTED} from "../sagas";
 import Downloads from '../containers/downloads';
 import {v4 as uuid} from 'uuid';
 import axios from "axios/index";
+
 const eio = require('engine.io-client');
 
 const GET_TOKEN = false;
@@ -24,28 +25,24 @@ class App extends Component {
     }
 
     componentDidMount() {
-        const userId = localStorage.getItem('userId') || uuid();
-        this.props.setUserId(userId);
-        localStorage.setItem('userId', userId);
-        this.props.fetchModels();
-        this.props.fetchHistory();
         this.onLogout = this.onLogout.bind(this);
         if (this.props.a360.token && !this.props.a360.info) {
             this.props.getA360Info();
         }
 
-        if(GET_TOKEN) {
+        if (GET_TOKEN) {
             axios.get('http://bimacadforge.azurewebsites.net/BimacadForgeHelper/GetAccessToken').then(response => {
                 this.props.setToken(response.data.access_token);
             }).catch(e => console.error('Token error', e));
         }
 
         const socket = eio('ws://localhost:9122');
-        socket.on('open', function(){
-            socket.on('message', function(data){
+        socket.on('open', function () {
+            socket.on('message', function (data) {
                 console.log(data);
             });
-            socket.on('close', function(){});
+            socket.on('close', function () {
+            });
         });
     }
 
@@ -93,9 +90,4 @@ function mapStateToProps(state) {
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    const actions = bindActionCreators({fetchModels, fetchHistory, logout, getA360Info, setUserId, setToken}, dispatch);
-    return {...actions, dispatch};
-}
-
-export default App = connect(mapStateToProps, mapDispatchToProps)(App);
+export default App = connect(mapStateToProps, {logout, getA360Info, setToken})(App);
