@@ -28,18 +28,26 @@ class TaskManager {
     async init() {
         const conn = await amqp.connect(`amqp://${this.queueServer}`);
 
+        await this.handleExport(conn);
+        await this.handleComplete(conn);
+        await this.handleErrors(conn);
+    }
+
+    async handleExport(conn) {
         this.exportRvtChannel = await conn.createChannel();
         this.exportRvtChannel.assertExchange(this.RVT_TASK_EXCHANGE, 'direct', {durable: true});
 
         this.convertNwcChannel = await conn.createChannel();
         this.convertNwcChannel.assertExchange(this.NWC_TASK_EXCHANGE, 'direct', {durable: true});
+    }
 
+    async handleComplete(conn) {
         this.completeNwcChannel = await conn.createChannel();
         this.completeNwcChannel.assertExchange(this.COMPLETE_NWCS_EXCANGE, 'direct', {durable: true});
-        const q = await this.completeNwcChannel.assertQueue('completeNwc', {});
-        this.completeNwcChannel.bindQueue(q.queue, this.COMPLETE_NWCS_EXCANGE, 'completeNwc');
-        this.completeNwcChannel.consume(q.queue, async(msg) => {
-            this.onNwcTaskComplete(msg);
+        const completeNwcQueue = await this.completeNwcChannel.assertQueue('completeNwc', {});
+        this.completeNwcChannel.bindQueue(completeNwcQueue.queue, this.COMPLETE_NWCS_EXCANGE, 'completeNwc');
+        this.completeNwcChannel.consume(completeNwcQueue.queue, async (msg) => {
+            await this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
             const task = await this.getNwcTask(msg);
             this.sendCompleteTask(task);
@@ -47,17 +55,41 @@ class TaskManager {
 
         this.completeRvtChannel = await conn.createChannel();
         this.completeRvtChannel.assertExchange(this.COMPLETE_RVTS_EXCANGE, 'direct', {durable: true});
-        const q1 = await this.completeRvtChannel.assertQueue('completeRvt', {});
-        this.completeRvtChannel.bindQueue(q1.queue, this.COMPLETE_RVTS_EXCANGE, 'completeRvt');
-        this.completeRvtChannel.consume(q1.queue, async(msg) => {
-            this.onRvtTaskComplete(msg);
+        const completeRvtQueue = await this.completeRvtChannel.assertQueue('completeRvt', {});
+        this.completeRvtChannel.bindQueue(completeRvtQueue.queue, this.COMPLETE_RVTS_EXCANGE, 'completeRvt');
+        this.completeRvtChannel.consume(completeRvtQueue.queue, async (msg) => {
+            await this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
             const task = await this.getRvtTask(msg);
             this.sendCompleteTask(task);
         });
     }
 
-    exportRvt(server, owner, serverModelPath, forUser) {
+    async handleErrors(conn) {
+        this.errorRvtChannel = await conn.createChannel();
+        this.errorRvtChannel.assertExchange(this.COMPLETE_RVTS_EXCANGE, 'direct', {durable: true});
+        const errorRvtQueue = await this.errorRvtChannel.assertQueue('errorRvt', {});
+        this.errorRvtChannel.bindQueue(errorRvtQueue.queue, this.COMPLETE_RVTS_EXCANGE, 'errorRvt');
+        this.errorRvtChannel.consume(errorRvtQueue.queu, async (msg) => {
+            const obj = await this.getRvtErrorTask(msg);
+            obj.task.status = 'error';
+            await obj.task.save();
+            this.sendCompleteTask(obj);
+        });
+
+        this.errorNwcChannel = await conn.createChannel();
+        this.errorNwcChannel.assertExchange(this.COMPLETE_NWCS_EXCANGE, 'direct', {durable: true});
+        const errorNwcQueue = await this.errorNwcChannel.assertQueue('errorNwc', {});
+        this.errorNwcChannel.bindQueue(errorNwcQueue.queue, this.COMPLETE_NWCS_EXCANGE, 'errorNwc');
+        this.errorNwcChannel.consume(errorNwcQueue.queu, async (msg) => {
+            const obj = await this.getNwcErrorTask(msg);
+            obj.task.status = 'error';
+            await obj.task.save();
+            this.sendCompleteTask(obj);
+        });
+    }
+
+    async exportRvt(server, owner, serverModelPath, forUser) {
         const serverModelName = serverModelPath.slice(serverModelPath.lastIndexOf('\\') + 1, serverModelPath.length);
         const id = uuid();
         const task = {
@@ -72,9 +104,7 @@ class TaskManager {
             status: 'new'
         };
 
-        ExportRvtTask.create(task, (err, t) => {
-            if (err) throw new Error(err.message);
-        });
+        await ExportRvtTask.create(task);
 
         this.exportRvtChannel.publish(this.RVT_TASK_EXCHANGE, server, new Buffer(JSON.stringify({
             id: task.id,
@@ -84,7 +114,7 @@ class TaskManager {
         return task;
     }
 
-    convertNwc(owner, rvtModelPath, name) {
+    async convertNwc(owner, rvtModelPath, name) {
         const rvtModelName = rvtModelPath.slice(rvtModelPath.lastIndexOf('\\'), rvtModelPath.length);
         const task = {
             id: uuid(),
@@ -96,9 +126,7 @@ class TaskManager {
             status: 'new'
         };
 
-        ConvertNwcTask.create(task, (err, t) => {
-            if (err) throw new Error(err.message);
-        });
+        await ConvertNwcTask.create(task);
 
         this.convertNwcChannel.publish(this.NWC_TASK_EXCHANGE, 'CPU', new Buffer(JSON.stringify({
             id: task.id,
@@ -108,33 +136,25 @@ class TaskManager {
         return task;
     }
 
-    onRvtTaskComplete(msg) {
+    async onRvtTaskComplete(msg) {
         const str = decoder.write(msg.content);
         const {id} = JSON.parse(str);
 
         const query = ExportRvtTask.findOne({id: id});
-        query.exec((err, task) => {
-            if (err) throw new Error(err.message);
-            task.status = 'complete';
-            task.save((err, updatedTask) => {
-                if (err) throw new Error(err.message);
-                if (!updatedTask.forUser) this.convertNwc(updatedTask.owner, updatedTask.resultPath, task.name.replace('.rvt', '.nwc'));
-            });
-        });
+        let task = await query.exec();
+        task.status = 'complete';
+        const updatedTask = await task.save();
+        if (!updatedTask.forUser) await this.convertNwc(updatedTask.owner, updatedTask.resultPath, task.name.replace('.rvt', '.nwc'));
     }
 
-    onNwcTaskComplete(msg) {
+    async onNwcTaskComplete(msg) {
         const str = decoder.write(msg.content);
         const {id} = JSON.parse(str);
 
         const query = ConvertNwcTask.findOne({id: id});
-        query.exec((err, task) => {
-            if (err) throw new Error(err.message);
-            task.status = 'complete';
-            task.save((err, updatedTask) => {
-                if (err) throw new Error(err.message);
-            });
-        });
+        let task = await query.exec();
+        task.status = 'complete';
+        await task.save();
     }
 
     addClient(id, socket) {
@@ -153,6 +173,22 @@ class TaskManager {
         const {id} = JSON.parse(str);
         const query = ConvertNwcTask.findOne({id: id});
         return await query.exec();
+    }
+
+    async getRvtErrorTask(msg) {
+        const str = decoder.write(msg.content);
+        const {id, errorMessage} = JSON.parse(str);
+        const query = ExportRvtTask.findOne({id: id});
+        const task = await query.exec();
+        return {task, errorMessage};
+    }
+
+    async getNwcErrorTask(msg) {
+        const str = decoder.write(msg.content);
+        const {id, errorMessage} = JSON.parse(str);
+        const query = ConvertNwcTask.findOne({id: id});
+        const task = await query.exec();
+        return {task, errorMessage};
     }
 
     sendCompleteTask(task) {
