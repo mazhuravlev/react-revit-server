@@ -6,6 +6,9 @@ const cors = require('@koa/cors');
 const {Model, History} = require('./mongo');
 const Mongoose = require('mongoose');
 
+const TaskManager = require('./taskmanager');
+const taskManager = new TaskManager();
+
 const PORT = 9121;
 const SOCKET_PORT = PORT + 1;
 
@@ -27,7 +30,14 @@ router.get('/models', async ctx => {
         {$sort: {count: -1}}
     ]);
     ctx.body = await cursor.toArray();
+}).post('/exportRvt', async ctx => {
+    const {server, owner, serverModelPath} = ctx.request.body;
+    ctx.body = taskManager.exportRvt(server, owner, serverModelPath, true);
+}).post('/convertNwc', async ctx => {
+    const {server, owner, serverModelPath} = ctx.request.body;
+    ctx.body = taskManager.exportRvt(server, owner, serverModelPath, false);
 });
+
 
 api.use('/api', router.routes());
 

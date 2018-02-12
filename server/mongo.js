@@ -3,7 +3,8 @@ const Schema = Mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 Mongoose.Promise = global.Promise;
 
-const mongo = Mongoose.connect('mongodb://user:user@localhost/models');
+const mongo = Mongoose.connect('mongodb://localhost/tasks');
+// const mongo = Mongoose.connect('mongodb://user:user@localhost/models');
 
 const HistorySchema = Schema({
     _id: ObjectId,
@@ -27,21 +28,25 @@ const Model = Mongoose.model('model', ModelSchema);
 const ExportRvtTaskSchema = Schema({
     id: String,
     date: Date,
+    name: String,
     serverModelPath: String,
     resultPath: String,
+    server: String,
     owner: String,
+    forUser: Boolean,
     status: String
 });
-const ExportRvtTask = Mongoose.model(ExportRvtTaskSchema);
+const ExportRvtTask = Mongoose.model('RvtTasks', ExportRvtTaskSchema);
 
 const ConvertNwcTaskSchema = Schema({
     id: String,
     date: Date,
+    name: String,
     rvtModelPath: String,
     resultPath: String,
     owner: String,
     status: String
 });
-const ConvertNwcTask = Mongoose.model(ConvertNwcTaskSchema);
+const ConvertNwcTask = Mongoose.model('NwcTasks', ConvertNwcTaskSchema);
 
 module.exports = {Model, History, ExportRvtTask, ConvertNwcTask, ObjectId};
