@@ -43,7 +43,7 @@ api.use('/api', router.routes());
 
 app.use(async (ctx, next) => {
     const authHeader = ctx.headers['authorization'];
-    if(authHeader) {
+    if (authHeader) {
         ctx.state.user = {id: getToken(authHeader)};
     }
     await next();
@@ -57,7 +57,8 @@ console.log(`[KOA] Listening on ${PORT}`);
 app.listen(PORT);
 
 const engine = require('engine.io');
-const server = engine.listen(SOCKET_PORT, { handlePreflightRequest: function (req, res) {
+const server = engine.listen(SOCKET_PORT, {
+    handlePreflightRequest: function (req, res) {
         const headers = {
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
             'Access-Control-Allow-Origin': 'http://localhost:8091',
@@ -65,12 +66,14 @@ const server = engine.listen(SOCKET_PORT, { handlePreflightRequest: function (re
         };
         res.writeHead(200, headers);
         res.end();
-    }});
+    }
+});
 console.log(`[ENGINE.IO] Listening on ${SOCKET_PORT}`);
 
 server.on('connection', function (socket) {
     const userId = getToken(socket.request.headers.authorization);
     socket.send(`[HELLO] ${userId}`);
+    taskManager.addClient(userId, socket);
 });
 
 function getToken(authHeader) {

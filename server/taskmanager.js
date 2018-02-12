@@ -20,6 +20,7 @@ class TaskManager {
         this.NWC_TASK_EXCHANGE = 'convertNwc';
         this.COMPLETE_RVTS_EXCANGE = 'rvt';
         this.COMPLETE_NWCS_EXCANGE = 'nwc';
+        this.clients = {};
 
         this.init();
     }
@@ -40,6 +41,8 @@ class TaskManager {
         this.completeNwcChannel.consume(q.queue, msg => {
             this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
+            const task = this.getNwcTask(msg);
+            this.sendCompleteTask(task);
         });
 
         this.completeRvtChannel = await conn.createChannel();
@@ -49,6 +52,8 @@ class TaskManager {
         this.completeRvtChannel.consume(q1.queue, msg => {
             this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
+            const task = this.getRvtTask(msg);
+            this.sendCompleteTask(task);
         });
     }
 
@@ -130,6 +135,31 @@ class TaskManager {
                 if (err) throw new Error(err.message);
             });
         });
+    }
+
+    addClient(id, socket) {
+        this.clients[id] = socket;
+    }
+
+    async getRvtTask(msg) {
+        const str = decoder.write(msg.content);
+        const {id} = JSON.parse(str);
+        const query = ExportRvtTask.findOne({id: id});
+        return await query.exec();
+    }
+
+    async getNwcTask(msg) {
+        const str = decoder.write(msg.content);
+        const {id} = JSON.parse(str);
+        const query = ConvertNwcTask.findOne({id: id});
+        return await query.exec();
+    }
+
+    sendCompleteTask(task) {
+        const socket = this.clients[task.id];
+        if (socket) {
+            socket.send(JSON.stringify(task));
+        }
     }
 }
 
