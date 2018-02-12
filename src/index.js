@@ -28,7 +28,13 @@ const userId = localStorage.getItem(USER_ID_KEY) || uuid();
 store.dispatch(setUserId(userId));
 localStorage.setItem(USER_ID_KEY, userId);
 
-const socket = eio('ws://localhost:9122');
+const opts = {
+    extraHeaders: {
+        'Authorization': `Bearer ${userId}`,
+    }
+};
+
+const socket = eio('ws://localhost:9122', opts);
 socket.on('open', function () {
     socket.on('message', function (data) {
         console.log(data);
