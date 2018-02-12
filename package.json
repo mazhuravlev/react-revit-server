@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
+    "amqplib": "^0.5.2",
     "axios": "^0.17.1",
     "babel-preset-stage-1": "^6.1.18",
     "chart.js": "^1.1.1",
@@ -50,6 +51,7 @@
     "lodash": "^3.10.1",
     "moment": "^2.20.1",
     "mongoose": "^5.0.1",
+    "nconf": "^0.10.0",
     "node-cron": "^1.2.1",
     "pciinfo": "^1.0.0",
     "query-string": "^5.0.1",
