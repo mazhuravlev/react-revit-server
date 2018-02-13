@@ -40,12 +40,12 @@ class Download extends Component {
         </tr>);
     }
 
-    getModelDownloadStateView({path, state, link}) {
+    getModelDownloadStateView({path, state, link, name}) {
         switch (state) {
             case STATE_START:
                 return <img src={loader}/>;
             case STATE_SUCCESS:
-                return <a target='_blank' href={link} className='btn btn-sm btn-primary' onClick={() => this.props.removeDownload(path)}>скачать</a>;
+                return <a target='_blank' href={link} download={name} className='btn btn-sm btn-primary' onClick={() => this.props.removeDownload(path)}>скачать</a>;
             case STATE_FAIL:
                 return <span className='error'>ошибка</span>;
             default:

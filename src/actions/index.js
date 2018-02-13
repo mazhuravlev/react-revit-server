@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {DOWNLOAD_NWC_START, DOWNLOAD_RVT_START} from "../sagas";
+import {DOWNLOAD_NWC_START, DOWNLOAD_RVT_START, DOWNLOAD_SUCCESS} from "../sagas";
 
 const ROOT_URL = `/api`;
 
@@ -94,33 +94,45 @@ export function logout() {
     };
 }
 
-export function downloadModel(path) {
+export function downloadModel(serverModelPath) {
     return {
         type: DOWNLOAD_RVT_START,
-        payload: {path}
+        payload: {serverModelPath}
     }
 }
 
-export function removeDownload(path) {
+export function removeDownload(serverModelPath) {
     return {
         type: REMOVE_DOWNLOAD,
-        payload: {path}
+        payload: {serverModelPath}
     }
 }
 
-export function downloadNwc(path) {
+export function downloadNwc(serverModelPath) {
     return {
         type: DOWNLOAD_NWC_START,
-        payload: {path}
+        payload: {serverModelPath}
     }
 }
 
 
 export const SET_USER_ID = 'SET_USER_ID';
+
 export function setUserId(id) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${id}`;
     return {
         type: SET_USER_ID,
         payload: id
     };
+}
+
+export function downloadSuccess(id, type, serverModelPath, name) {
+    return {
+        type: DOWNLOAD_SUCCESS,
+        payload: {
+            serverModelPath: serverModelPath,
+            name: name,
+            link: `/api/download/${type}/${id}`
+        }
+    }
 }

@@ -1,4 +1,4 @@
-import {fetchHistory, fetchModels, setUserId} from "./actions";
+import {downloadSuccess, fetchHistory, fetchModels, setUserId} from "./actions";
 
 require("babel-core/register");
 require("babel-polyfill");
@@ -10,7 +10,7 @@ import {createStore, applyMiddleware} from 'redux';
 import ReduxPromise from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
 import createSagaMiddleware from 'redux-saga';
-import mySaga from './sagas';
+import mySaga, {DOWNLOAD_SUCCESS} from './sagas';
 import App from './components/app';
 import reducers from './reducers';
 
@@ -36,8 +36,15 @@ const opts = {
 
 const socket = eio('ws://localhost:9122', opts);
 socket.on('open', function () {
-    socket.on('message', function (data) {
-        console.log(data);
+    socket.on('message', function (messageString) {
+        const {type, payload} = JSON.parse(messageString);
+        switch (type) {
+            case 'EXPORT_COMPLETE':
+                store.dispatch(downloadSuccess(payload.task.id, payload.type, payload.task.serverModelPath, payload.task.name));
+                break;
+            default:
+                console.log('[MESSAGE]', message);
+        }
     });
     socket.on('close', function () {
     });

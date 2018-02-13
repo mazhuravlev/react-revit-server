@@ -41,6 +41,7 @@ const ConvertNwcTaskSchema = Schema({
     id: String,
     date: Date,
     name: String,
+    serverModelPath: String,
     rvtModelPath: String,
     resultPath: String,
     owner: String,

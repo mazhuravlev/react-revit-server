@@ -47,7 +47,7 @@ class TaskManager {
             await this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
             const task = await this.getNwcTask(msg);
-            this.sendCompleteTask({task, errorMessage: null});
+            this.sendCompleteTask({task, type: 'nwc', errorMessage: null});
         });
 
         this.completeRvtChannel = await conn.createChannel();
@@ -55,7 +55,7 @@ class TaskManager {
             await this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
             const task = await this.getRvtTask(msg);
-            this.sendCompleteTask({task, errorMessage: null});
+            if (task.forUser) this.sendCompleteTask({task, type: 'rvt', errorMessage: null});
         });
     }
 
@@ -90,14 +90,14 @@ class TaskManager {
         const serverModelName = serverModelPath.slice(serverModelPath.lastIndexOf('\\') + 1, serverModelPath.length);
         const id = uuid();
         const task = {
-            id: id,
+            id,
             date: Date.now(),
             name: serverModelName,
-            serverModelPath: serverModelPath,
+            serverModelPath,
             resultPath: `${rvtResutlPath}\\${id}.rvt`,
-            server: server,
-            owner: owner,
-            forUser: forUser,
+            server,
+            owner,
+            forUser,
             status: 'new'
         };
 
@@ -111,15 +111,16 @@ class TaskManager {
         return task;
     }
 
-    async convertNwc(owner, rvtModelPath, name) {
+    async convertNwc(owner, serverModelPath, rvtModelPath, name) {
         const rvtModelName = rvtModelPath.slice(rvtModelPath.lastIndexOf('\\'), rvtModelPath.length);
         const task = {
             id: uuid(),
             date: Date.now(),
-            name: name,
-            rvtModelPath: rvtModelPath,
+            name,
+            serverModelPath,
+            rvtModelPath,
             resultPath: `${nwcResultath}${rvtModelName.replace('.rvt', '.nwc')}`,
-            owner: owner,
+            owner,
             status: 'new'
         };
 
@@ -141,7 +142,7 @@ class TaskManager {
         let task = await query.exec();
         task.status = 'complete';
         const updatedTask = await task.save();
-        if (!updatedTask.forUser) await this.convertNwc(updatedTask.owner, updatedTask.resultPath, task.name.replace('.rvt', '.nwc'));
+        if (!updatedTask.forUser) await this.convertNwc(updatedTask.owner, updatedTask.serverModelPath, updatedTask.resultPath, task.name.replace('.rvt', '.nwc'));
     }
 
     async onNwcTaskComplete(msg) {
@@ -188,8 +189,12 @@ class TaskManager {
         return {task, errorMessage};
     }
 
-    sendCompleteTask(obj) {
-        const socket = this.clients[obj.task.owner];
+    sendCompleteTask(payload) {
+        this.sendMessage(payload.task.owner, {type: 'EXPORT_COMPLETE', payload});
+    }
+
+    sendMessage(to, obj) {
+        const socket = this.clients[to];
         if (socket) {
             socket.send(JSON.stringify(obj));
         }

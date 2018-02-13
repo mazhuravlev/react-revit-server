@@ -5,7 +5,7 @@ const logger = require('koa-logger');
 const cors = require('@koa/cors');
 const {Model, History, ExportRvtTask, ConvertNwcTask} = require('./mongo');
 const Mongoose = require('mongoose');
-const createReadStream = Promise.promisify(require("fs").createReadStream);
+const fs = require("fs");
 
 const TaskManager = require('./taskmanager');
 const taskManager = new TaskManager();
@@ -31,30 +31,20 @@ router.get('/models', async ctx => {
         {$sort: {count: -1}}
     ]);
     ctx.body = await cursor.toArray();
-}).get('/downloadRvt/:id', async ctx => {
+}).get('/download/:type/:id', async ctx => {
     const taskId = ctx.params.id;
-    const task = await ExportRvtTask.findOne({id: taskId});
-    if (task) {
-        const data = await createReadStream(task.resultPath);
-        this.set('Content-type', 'application-octet/stream');
-        ctx.body = data;
-    }
-}).get('/downloadNwc/:id', async ctx => {
-    const taskId = ctx.params.id;
-    const task = await ConvertNwcTask.findOne({id: taskId});
-    if (task) {
-        const data = await createReadStream(task.resultPath);
-        this.set('Content-type', 'application-octet/stream');
-        ctx.body = data;
-    }
+    const task = await (ctx.params.type === 'rvt' ? ExportRvtTask.findOne({id: taskId}) : ConvertNwcTask.findOne({id: taskId}));
+    if (!task) ctx.throw(404);
+    ctx.set('Content-type', 'application-octet/stream');
+    ctx.body = fs.createReadStream(task.resultPath);
 }).post('/exportRvt', async ctx => {
     const owner = ctx.state.user.id;
     const {server, serverModelPath} = ctx.request.body;
-    ctx.body = taskManager.exportRvt(server, owner, serverModelPath, true);
+    ctx.body = await taskManager.exportRvt(server, owner, serverModelPath, true);
 }).post('/convertNwc', async ctx => {
     const owner = ctx.state.user.id;
     const {server, serverModelPath} = ctx.request.body;
-    ctx.body = taskManager.exportRvt(server, owner, serverModelPath, false);
+    ctx.body = await taskManager.exportRvt(server, owner, serverModelPath, false);
 });
 api.use('/api', router.routes());
 
@@ -89,7 +79,6 @@ console.log(`[ENGINE.IO] Listening on ${SOCKET_PORT}`);
 
 server.on('connection', function (socket) {
     const userId = getToken(socket.request.headers.authorization);
-    socket.send(`[HELLO] ${userId}`);
     taskManager.addClient(userId, socket);
 });
 
