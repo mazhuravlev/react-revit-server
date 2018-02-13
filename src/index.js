@@ -10,9 +10,10 @@ import {createStore, applyMiddleware} from 'redux';
 import ReduxPromise from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
 import createSagaMiddleware from 'redux-saga';
-import mySaga, {DOWNLOAD_SUCCESS} from './sagas';
+import mySaga from './sagas';
 import App from './components/app';
 import reducers from './reducers';
+import {v4 as uuid} from 'uuid';
 
 const eio = require('engine.io-client');
 
