@@ -44,7 +44,7 @@ socket.on('open', function () {
                 store.dispatch(downloadSuccess(payload.task.id, payload.type, payload.task.serverModelPath, payload.task.name));
                 break;
             default:
-                console.log('[MESSAGE]', message);
+                console.log(`[MESSAGE: ${type}]`, payload);
         }
     });
     socket.on('close', function () {

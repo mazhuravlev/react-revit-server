@@ -80,6 +80,10 @@ console.log(`[ENGINE.IO] Listening on ${SOCKET_PORT}`);
 server.on('connection', function (socket) {
     const userId = getToken(socket.request.headers.authorization);
     taskManager.addClient(userId, socket);
+    const ping = JSON.stringify({type: 'PING'});
+    socket.send(ping);
+    const interval = setInterval(() => socket.send(ping), 60000);
+    socket.on('close', () => clearInterval(interval));
 });
 
 function getToken(authHeader) {
