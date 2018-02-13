@@ -94,7 +94,7 @@ class TaskManager {
             date: Date.now(),
             name: serverModelName,
             serverModelPath,
-            resultPath: `${rvtResutlPath}\\${id}.rvt`,
+            resultPath: `${rvtResutlPath}/${id}.rvt`,
             server,
             owner,
             forUser,
@@ -112,7 +112,7 @@ class TaskManager {
     }
 
     async convertNwc(owner, serverModelPath, rvtModelPath, name) {
-        const rvtModelName = rvtModelPath.slice(rvtModelPath.lastIndexOf('\\'), rvtModelPath.length);
+        const rvtModelName = rvtModelPath.slice(rvtModelPath.lastIndexOf('/'), rvtModelPath.length);
         const task = {
             id: uuid(),
             date: Date.now(),
