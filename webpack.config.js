@@ -33,9 +33,7 @@ module.exports = {
             {
                 test: /\.(gif|png|jpe?g|svg)$/i,
                 loader: 'file-loader',
-                options: {
-
-                }
+                options: {}
             }
         ]
     },
@@ -47,7 +45,7 @@ module.exports = {
         contentBase: './',
         proxy: {
             "/api": "http://localhost:9121",
-            "/engine.io": "http://localhost:9121"
+            "/engine.io": {target: "http://localhost:9122", ws: true}
         }
     }
 };

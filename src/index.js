@@ -35,7 +35,7 @@ const opts = {
     }
 };
 
-const socket = eio('ws://localhost:9122', opts);
+const socket = eio(`ws://${window.location.host}`, opts);
 socket.on('open', function () {
     socket.on('message', function (messageString) {
         const {type, payload} = JSON.parse(messageString);
