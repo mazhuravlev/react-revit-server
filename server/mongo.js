@@ -16,6 +16,7 @@ const History = Mongoose.model('history', HistorySchema);
 
 const ModelSchema = Schema({
     _id: ObjectId,
+    guid: String,
     name: String,
     fullName: String,
     weekSync: Number,

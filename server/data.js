@@ -16,8 +16,10 @@ async function getFolderTree(folder) {
   for (let i = 0; i < data.Models.length; i++) {
     const model = data.Models[i];
     model.id = new mongoose.Types.ObjectId;
-    const history = await getModelHistory(folder + '|' + model.Name);
-    models.push({model, history});
+    const modelPath = folder + '|' + model.Name;
+    const history = await getModelHistory(modelPath);
+    const info = await getModelInfo(modelPath);
+    models.push({model, history, info});
   }
   const isEmpty = folders.length === 0 && data.Models.length === 0;
   return {
@@ -53,6 +55,16 @@ async function getModelHistory(modelPath) {
   } catch (e) {
     return null;
   }
+}
+
+async function getModelInfo(modelPath) {
+    const url = `${ROOT_URL}/${makeUrlPath(modelPath)}/modelInfo`;
+    try {
+        const res = await makeRequest(url);
+        return res.data;
+    } catch (e) {
+        return null;
+    }
 }
 
 async function makeRequest(url) {

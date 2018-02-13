@@ -31,6 +31,7 @@ async function run() {
             model.name = modelData.model.Name;
             const res = await model.save();
         }
+        model.guid = modelData.info.ModelGUID;
         model.weekSync = 0;
         model.lastSync = new Date();
         model.modelSize = modelData.model.ModelSize;
