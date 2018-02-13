@@ -47,7 +47,7 @@ class TaskManager {
             await this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
             const task = await this.getNwcTask(msg);
-            this.sendCompleteTask(task);
+            this.sendCompleteTask({task, errorMessage: ''});
         });
 
         this.completeRvtChannel = await conn.createChannel();
@@ -55,7 +55,7 @@ class TaskManager {
             await this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
             const task = await this.getRvtTask(msg);
-            this.sendCompleteTask(task);
+            this.sendCompleteTask({task, errorMessage: ''});
         });
     }
 
@@ -188,10 +188,10 @@ class TaskManager {
         return {task, errorMessage};
     }
 
-    sendCompleteTask(task) {
-        const socket = this.clients[task.owner];
+    sendCompleteTask(obj) {
+        const socket = this.clients[obj.task.owner];
         if (socket) {
-            socket.send(JSON.stringify(task));
+            socket.send(JSON.stringify(obj));
         }
     }
 }
