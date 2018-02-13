@@ -35,18 +35,15 @@ class TaskManager {
 
     async handleExport(conn) {
         this.exportRvtChannel = await conn.createChannel();
-        this.exportRvtChannel.assertExchange(this.RVT_TASK_EXCHANGE, 'direct', {durable: true});
+        await this.setExchange(this.exportRvtChannel, this.RVT_TASK_EXCHANGE);
 
         this.convertNwcChannel = await conn.createChannel();
-        this.convertNwcChannel.assertExchange(this.NWC_TASK_EXCHANGE, 'direct', {durable: true});
+        await this.setExchange(this.convertNwcChannel, this.NWC_TASK_EXCHANGE);
     }
 
     async handleComplete(conn) {
         this.completeNwcChannel = await conn.createChannel();
-        this.completeNwcChannel.assertExchange(this.COMPLETE_NWCS_EXCANGE, 'direct', {durable: true});
-        const completeNwcQueue = await this.completeNwcChannel.assertQueue('completeNwc', {});
-        this.completeNwcChannel.bindQueue(completeNwcQueue.queue, this.COMPLETE_NWCS_EXCANGE, 'completeNwc');
-        this.completeNwcChannel.consume(completeNwcQueue.queue, async (msg) => {
+        await this.setExchange(this.completeNwcChannel, this.COMPLETE_NWCS_EXCANGE, 'completeNwc', async (msg) => {
             await this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
             const task = await this.getNwcTask(msg);
@@ -54,10 +51,7 @@ class TaskManager {
         });
 
         this.completeRvtChannel = await conn.createChannel();
-        this.completeRvtChannel.assertExchange(this.COMPLETE_RVTS_EXCANGE, 'direct', {durable: true});
-        const completeRvtQueue = await this.completeRvtChannel.assertQueue('completeRvt', {});
-        this.completeRvtChannel.bindQueue(completeRvtQueue.queue, this.COMPLETE_RVTS_EXCANGE, 'completeRvt');
-        this.completeRvtChannel.consume(completeRvtQueue.queue, async (msg) => {
+        await this.setExchange(this.completeRvtChannel, this.COMPLETE_RVTS_EXCANGE, 'completeRvt', async (msg) => {
             await this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
             const task = await this.getRvtTask(msg);
@@ -67,10 +61,7 @@ class TaskManager {
 
     async handleErrors(conn) {
         this.errorRvtChannel = await conn.createChannel();
-        this.errorRvtChannel.assertExchange(this.COMPLETE_RVTS_EXCANGE, 'direct', {durable: true});
-        const errorRvtQueue = await this.errorRvtChannel.assertQueue('errorRvt', {});
-        this.errorRvtChannel.bindQueue(errorRvtQueue.queue, this.COMPLETE_RVTS_EXCANGE, 'errorRvt');
-        this.errorRvtChannel.consume(errorRvtQueue.queu, async (msg) => {
+        await this.setExchange(this.errorRvtChannel, this.COMPLETE_RVTS_EXCANGE, 'errorRvt', async (msg) => {
             const obj = await this.getRvtErrorTask(msg);
             obj.task.status = 'error';
             await obj.task.save();
@@ -78,15 +69,21 @@ class TaskManager {
         });
 
         this.errorNwcChannel = await conn.createChannel();
-        this.errorNwcChannel.assertExchange(this.COMPLETE_NWCS_EXCANGE, 'direct', {durable: true});
-        const errorNwcQueue = await this.errorNwcChannel.assertQueue('errorNwc', {});
-        this.errorNwcChannel.bindQueue(errorNwcQueue.queue, this.COMPLETE_NWCS_EXCANGE, 'errorNwc');
-        this.errorNwcChannel.consume(errorNwcQueue.queu, async (msg) => {
+        await this.setExchange(this.errorNwcChannel, this.COMPLETE_NWCS_EXCANGE, 'errorNwc', async (msg) => {
             const obj = await this.getNwcErrorTask(msg);
             obj.task.status = 'error';
             await obj.task.save();
             this.sendCompleteTask(obj);
         });
+    }
+
+    async setExchange(channel, exchangeName, queueName, consumeCallback) {
+        channel.assertExchange(exchangeName, 'direct', {durable: true});
+        if (queueName && consumeCallback) {
+            const queue = await channel.assertQueue(queueName, {});
+            channel.bindQueue(queue.queue, exchangeName, queueName);
+            channel.consume(queue.queue, async (msg) => consumeCallback(msg));
+        }
     }
 
     async exportRvt(server, owner, serverModelPath, forUser) {
