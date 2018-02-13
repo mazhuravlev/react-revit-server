@@ -3,8 +3,9 @@ const Router = require('koa-router');
 const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
 const cors = require('@koa/cors');
-const {Model, History} = require('./mongo');
+const {Model, History, ExportRvtTask, ConvertNwcTask} = require('./mongo');
 const Mongoose = require('mongoose');
+const createReadStream = Promise.promisify(require("fs").createReadStream);
 
 const TaskManager = require('./taskmanager');
 const taskManager = new TaskManager();
@@ -30,6 +31,22 @@ router.get('/models', async ctx => {
         {$sort: {count: -1}}
     ]);
     ctx.body = await cursor.toArray();
+}).get('/downloadRvt/:id', async ctx => {
+    const taskId = ctx.params.id;
+    const task = await ExportRvtTask.findOne({id: taskId});
+    if (task) {
+        const data = await createReadStream(task.resultPath);
+        this.set('Content-type', 'application-octet/stream');
+        ctx.body = data;
+    }
+}).get('/downloadNwc/:id', async ctx => {
+    const taskId = ctx.params.id;
+    const task = await ConvertNwcTask.findOne({id: taskId});
+    if (task) {
+        const data = await createReadStream(task.resultPath);
+        this.set('Content-type', 'application-octet/stream');
+        ctx.body = data;
+    }
 }).post('/exportRvt', async ctx => {
     const owner = ctx.state.user.id;
     const {server, serverModelPath} = ctx.request.body;

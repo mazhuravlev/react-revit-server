@@ -47,7 +47,7 @@ class TaskManager {
             await this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
             const task = await this.getNwcTask(msg);
-            this.sendCompleteTask({task, errorMessage: ''});
+            this.sendCompleteTask({task, errorMessage: null});
         });
 
         this.completeRvtChannel = await conn.createChannel();
@@ -55,7 +55,7 @@ class TaskManager {
             await this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
             const task = await this.getRvtTask(msg);
-            this.sendCompleteTask({task, errorMessage: ''});
+            this.sendCompleteTask({task, errorMessage: null});
         });
     }
 
