@@ -1,4 +1,7 @@
-import {TASK_DOWNLOADED} from "../shared/taskStates";
+require("babel-core/register");
+require("babel-polyfill");
+
+const {TASK_DOWNLOADED} = require("../shared/taskStates");
 
 const Koa = require('koa');
 const Router = require('koa-router');
@@ -42,10 +45,11 @@ router.get('/models', async ctx => {
     const taskId = ctx.params.id;
     const task = await (ctx.params.type === 'rvt' ? ExportRvtTask.findOne({id: taskId}) : ConvertNwcTask.findOne({id: taskId}));
     if (!task) ctx.throw(404);
-    ctx.set('Content-type', 'application-octet/stream');
-    ctx.body = fs.createReadStream(task.resultPath);
+    const stream = fs.createReadStream(task.resultPath);
     task.status = TASK_DOWNLOADED;
     await task.save();
+    ctx.set('Content-type', 'application-octet/stream');
+    ctx.body = stream;
 }).post('/exportRvt', async ctx => {
     const owner = ctx.state.user.id;
     const {server, serverModelPath} = ctx.request.body;
@@ -65,7 +69,7 @@ app.use(async (ctx, next) => {
     await next();
 });
 app.use(cors());
-app.use(logger());
+//app.use(logger());
 app.use(bodyparser());
 app.use(api.routes());
 

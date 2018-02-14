@@ -1,4 +1,4 @@
-import {downloadSuccess, fetchDownloads, fetchHistory, fetchModels, setUserId} from "./actions";
+import {downloadInProgress, downloadSuccess, fetchDownloads, fetchHistory, fetchModels, setUserId} from "./actions";
 
 require("babel-core/register");
 require("babel-polyfill");
@@ -14,6 +14,7 @@ import mySaga from './sagas';
 import App from './components/app';
 import reducers from './reducers';
 import {v4 as uuid} from 'uuid';
+import * as TaskStates from "../shared/taskStates";
 
 const eio = require('engine.io-client');
 
@@ -41,7 +42,10 @@ socket.on('open', function () {
     socket.on('message', function (messageString) {
         const {type, payload} = JSON.parse(messageString);
         switch (type) {
-            case 'EXPORT_COMPLETE':
+            case TaskStates.TASK_IN_PROGRESS:
+                store.dispatch(downloadInProgress(payload.task.serverModelPath));
+                break;
+            case TaskStates.TASK_COMPLETE:
                 store.dispatch(downloadSuccess(payload.task.id, payload.type, payload.task.serverModelPath, payload.task.name));
                 break;
             default:

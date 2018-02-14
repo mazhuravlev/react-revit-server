@@ -1,1 +1,3 @@
-export const EXPORT_COMPLETE = 'EXPORT_COMPLETE';
+module.exports = {
+    EXPORT_COMPLETE: 'EXPORT_COMPLETE',
+};

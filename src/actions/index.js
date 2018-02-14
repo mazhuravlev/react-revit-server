@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {DOWNLOAD_NWC_START, DOWNLOAD_RVT_START, DOWNLOAD_SUCCESS} from "../sagas";
+import {makeDownloadLink} from '../../shared/makeDownloadLink';
 
 const ROOT_URL = `/api`;
 
@@ -146,7 +147,15 @@ export function downloadSuccess(id, type, serverModelPath, name) {
         payload: {
             serverModelPath: serverModelPath,
             name: name,
-            link: `/api/download/${type}/${id}`
+            link: makeDownloadLink(type, id)
         }
     }
+}
+
+export const DOWNLOAD_IN_PROGRESS = 'DOWNLOAD_IN_PROGRESS';
+export function downloadInProgress(serverModelPath) {
+    return {
+        type: DOWNLOAD_IN_PROGRESS,
+        payload: {serverModelPath}
+    };
 }

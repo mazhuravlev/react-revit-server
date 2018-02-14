@@ -1,11 +1,15 @@
-export const RVT_TASK_EXCHANGE = 'extractRvt';
-export const COMPLETE_RVT_EXCHANGE = 'rvt';
-export const COMPLETE_RVT_QUEUE = 'completeRvt';
-export const INPROGRESS_RVT_QUEUE = 'rvtInProgress';
-export const ERROR_RVT_QUEUE = 'errorRvt';
+const QueueNames = {
+    EXCHANGE_RVT_TASK: 'extractRvt',
+    EXCHANGE_COMPLETE_RVT: 'rvt',
+    QUEUE_COMPLETE_RVT: 'completeRvt',
+    QUEUE_IN_PROGRESS_RVT: 'rvtInProgress',
+    QUEUE_ERROR_RVT: 'errorRvt',
 
-export const NWC_TASK_EXCHANGE = 'convertNwc';
-export const COMPLETE_NWC_EXCHANGE = 'nwc';
-export const COMPLETE_NWC_QUEUE = 'completeNwv';
-export const ERROR_NWC_QUEUE = 'errorNWC';
-export const INPROGRESS_NWC_QUEUE = 'nwcInProgress';
+    EXCHANGE_NWC_TASK: 'convertNwc',
+    EXCHANGE_COMPLETE_NWC: 'nwc',
+    QUEUE_COMPLETE_NWC: 'completeNwv',
+    QUEUE_ERROR_NWC: 'errorNWC',
+    QUEUE_IN_PROGRESS_NWC: 'nwcInProgress',
+};
+
+module.exports = QueueNames;

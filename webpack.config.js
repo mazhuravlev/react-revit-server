@@ -1,9 +1,7 @@
-const FlowWebpackPlugin = require('flow-webpack-plugin');
-
 module.exports = {
     devtool: 'source-map',
     plugins: [
-        new FlowWebpackPlugin(),
+
     ],
     entry: [
         'babel-polyfill', './src/index.js'

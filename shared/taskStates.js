@@ -1,6 +1,10 @@
-export const TASK_NEW = 'TASK_NEW';
-export const TASK_IN_PROGRESS = 'TASK_IN_PROGRESS';
-export const TASK_FAILED = 'TASK_FAILED';
-export const TASK_COMPLETE = 'TASK_COMPLETE';
-export const TASK_DOWNLOADED = 'TASK_DOWNLOADED';
-export const TASK_DELETED = 'TASK_DELETED';
+const TaskStates = {
+    TASK_NEW: 'TASK_NEW',
+    TASK_IN_PROGRESS: 'TASK_IN_PROGRESS',
+    TASK_FAILED: 'TASK_FAILED',
+    TASK_COMPLETE: 'TASK_COMPLETE',
+    TASK_DOWNLOADED: 'TASK_DOWNLOADED',
+    TASK_DELETED: 'TASK_DELETED',
+};
+
+module.exports = TaskStates;
