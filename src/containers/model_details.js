@@ -5,7 +5,7 @@ import {downloadModel, downloadNwc, fetchModelDetails} from "../actions";
 import {bindActionCreators} from "redux";
 import Viewer from "../components/viewer/Viewer";
 import {chartSelector} from "../selectors/chartSelector";
-import {STATE_FAIL} from "../reducers/reducer_download";
+import {TASK_FAILED} from "../reducers/reducer_download";
 import {tokenSelector} from "../selectors/tokenSelector";
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
@@ -94,7 +94,7 @@ class ModelDetails extends Component {
 
     canDownload({fullName}) {
         const {download} = this.props;
-        return fullName in download && download[fullName].state !== STATE_FAIL;
+        return fullName in download && download[fullName].state !== TASK_FAILED;
     }
 }
 

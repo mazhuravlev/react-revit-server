@@ -13,7 +13,7 @@ function processHistory(_history) {
         return Number(`${x.moment.year()}${padWeek(x.moment.week())}`);
     });
     return _.sortBy(Object.values(g).map(x => ({
-        modelSize: mean(_.pluck(x, 'modelSize')),
+        modelSize: mean(_.map(x, 'modelSize')),
         count: x.length,
         //users: _.uniq(_.pluck(x, 'user')),
         users: _.sortBy(Object.values(_.groupBy(x, 'user')), ug => -ug.length).map(ug => `${ug[0].user}: ${ug.length}`),

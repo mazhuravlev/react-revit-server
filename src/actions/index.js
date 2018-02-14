@@ -14,6 +14,20 @@ export const BEGIN_FETCH_A360_INFO = 'BEGIN_FETCH_A360_INFO';
 export const FETCH_A360_INFO = 'FETCH_A360_INFO';
 export const LOGOUT = 'LOGOUT';
 export const REMOVE_DOWNLOAD = 'REMOVE_DOWNLOAD';
+export const FETCH_DOWNLOADS_START = 'FETCH_DOWNLOADS_START';
+export const FETCH_DOWNLOADS_SUCCESS = 'FETCH_DOWNLOADS_SUCCESS';
+
+export function fetchDownloads() {
+    const url = `${ROOT_URL}/downloads`;
+    const request = axios.get(url);
+    return (dispatch, getState) => {
+        dispatch({type: FETCH_DOWNLOADS_START});
+        request.then(res => dispatch({
+            type: FETCH_DOWNLOADS_SUCCESS,
+            payload: res.data
+        })).catch(e => console.error(e));
+    };
+}
 
 export function fetchModels() {
     const url = `${ROOT_URL}/models`;

@@ -31,6 +31,11 @@ router.get('/models', async ctx => {
         {$sort: {count: -1}}
     ]);
     ctx.body = await cursor.toArray();
+}).get('/downloads', async (ctx, next) => {
+    const filter = {owner: ctx.state.user.id};
+    const rvtTasks = await ExportRvtTask.find(filter);
+    const nwcTasks = await ConvertNwcTask.find(filter);
+    ctx.body = rvtTasks.concat(nwcTasks);
 }).get('/download/:type/:id', async ctx => {
     const taskId = ctx.params.id;
     const task = await (ctx.params.type === 'rvt' ? ExportRvtTask.findOne({id: taskId}) : ConvertNwcTask.findOne({id: taskId}));

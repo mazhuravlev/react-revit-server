@@ -1,4 +1,4 @@
-import {downloadSuccess, fetchHistory, fetchModels, setUserId} from "./actions";
+import {downloadSuccess, fetchDownloads, fetchHistory, fetchModels, setUserId} from "./actions";
 
 require("babel-core/register");
 require("babel-polyfill");
@@ -28,6 +28,7 @@ store.dispatch(fetchHistory());
 const userId = localStorage.getItem(USER_ID_KEY) || uuid();
 store.dispatch(setUserId(userId));
 localStorage.setItem(USER_ID_KEY, userId);
+store.dispatch(fetchDownloads());
 
 const opts = {
     extraHeaders: {

@@ -3,7 +3,7 @@ const TABLE_SETTINGS = {
     nextText: 'Вперед',
     loadingText: 'Загрузка...',
     noDataText: 'Нет данных',
-    pageText: 'Страница',
+    pageText: '',//'Страница',
     ofText: 'из',
     rowsText: 'строк',
 };
