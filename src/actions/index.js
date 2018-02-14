@@ -153,9 +153,9 @@ export function downloadSuccess(id, type, serverModelPath, name) {
 }
 
 export const DOWNLOAD_IN_PROGRESS = 'DOWNLOAD_IN_PROGRESS';
-export function downloadInProgress(serverModelPath) {
+export function downloadInProgress(task) {
     return {
         type: DOWNLOAD_IN_PROGRESS,
-        payload: {serverModelPath}
+        payload: {task}
     };
 }

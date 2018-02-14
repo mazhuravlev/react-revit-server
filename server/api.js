@@ -37,7 +37,7 @@ router.get('/models', async ctx => {
     ]);
     ctx.body = await cursor.toArray();
 }).get('/downloads', async (ctx, next) => {
-    const filter = {owner: ctx.state.user.id};
+    const filter = {owner: ctx.state.user.id, status: {$ne: TASK_DOWNLOADED}};
     const rvtTasks = await ExportRvtTask.find(filter);
     const nwcTasks = await ConvertNwcTask.find(filter);
     ctx.body = rvtTasks.concat(nwcTasks);

@@ -43,7 +43,7 @@ socket.on('open', function () {
         const {type, payload} = JSON.parse(messageString);
         switch (type) {
             case TaskStates.TASK_IN_PROGRESS:
-                store.dispatch(downloadInProgress(payload.task.serverModelPath));
+                store.dispatch(downloadInProgress(payload.task));
                 break;
             case TaskStates.TASK_COMPLETE:
                 store.dispatch(downloadSuccess(payload.task.id, payload.type, payload.task.serverModelPath, payload.task.name));

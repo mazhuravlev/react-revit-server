@@ -11,7 +11,7 @@ import {makeDownloadLink} from '../../shared/makeDownloadLink';
 export default function reducerDownload(state = {}, {type, payload}) {
     switch (type) {
         case DOWNLOAD_RVT_START:
-            return {...state, [payload.serverModelPath]: {state: TASK_NEW}};
+            return {...state, [payload.serverModelPath]: {state: TASK_NEW, name: '.rvt'}};
         case DOWNLOAD_SUCCESS:
             return {
                 ...state,
@@ -23,11 +23,11 @@ export default function reducerDownload(state = {}, {type, payload}) {
             const {[payload.serverModelPath]: foo, ...noDeleted} = state;
             return noDeleted;
         case DOWNLOAD_NWC_START:
-            return {...state, [payload.serverModelPath]: {state: TASK_NEW}};
+            return {...state, [payload.serverModelPath]: {state: TASK_NEW, name: '.nwc'}};
         case DOWNLOAD_NWC_FAIL:
             return {...state, [payload.serverModelPath]: {state: TASK_FAILED}};
         case DOWNLOAD_IN_PROGRESS:
-            return {...state, [payload.serverModelPath]: {state: TASK_IN_PROGRESS}};
+            return {...state, [payload.task.serverModelPath]: {state: TASK_IN_PROGRESS, name: payload.task.name}};
         case FETCH_DOWNLOADS_SUCCESS:
             const downloads = _.keyBy(payload, 'serverModelPath');
             return _.mapValues(downloads, x => ({

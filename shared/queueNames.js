@@ -7,8 +7,8 @@ const QueueNames = {
 
     EXCHANGE_NWC_TASK: 'convertNwc',
     EXCHANGE_COMPLETE_NWC: 'nwc',
-    QUEUE_COMPLETE_NWC: 'completeNwv',
-    QUEUE_ERROR_NWC: 'errorNWC',
+    QUEUE_COMPLETE_NWC: 'completeNwc',
+    QUEUE_ERROR_NWC: 'errorNwc',
     QUEUE_IN_PROGRESS_NWC: 'nwcInProgress',
 };
 

@@ -17,6 +17,7 @@ class Download extends Component {
                     <thead>
                     <tr>
                         <th>Модель</th>
+                        <th>Тип</th>
                         <th>Скачать</th>
                     </tr>
                     </thead>
@@ -35,6 +36,7 @@ class Download extends Component {
     makeRow(download) {
         return (<tr key={download.path}>
             <td>{download.path}</td>
+            <td>{download.name && (download.name.includes('.rvt') ? 'RVT' : 'NWC')}</td>
             <td>{this.getModelDownloadStateView(download)}</td>
         </tr>);
     }
