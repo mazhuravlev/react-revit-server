@@ -1,3 +1,5 @@
+import {TASK_DOWNLOADED} from "../shared/taskStates";
+
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyparser = require('koa-bodyparser');
@@ -42,6 +44,8 @@ router.get('/models', async ctx => {
     if (!task) ctx.throw(404);
     ctx.set('Content-type', 'application-octet/stream');
     ctx.body = fs.createReadStream(task.resultPath);
+    task.status = TASK_DOWNLOADED;
+    await task.save();
 }).post('/exportRvt', async ctx => {
     const owner = ctx.state.user.id;
     const {server, serverModelPath} = ctx.request.body;
