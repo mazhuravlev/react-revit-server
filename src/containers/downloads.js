@@ -5,6 +5,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import {downloadSelector} from "../selectors/downloadSelector";
 import * as TaskStates from "../../shared/taskStates";
 const loader = require('../loader-sm.gif');
+const loaderSpecial = require('../loader-special.gif');
 
 
 class Download extends Component {
@@ -46,7 +47,7 @@ class Download extends Component {
             case TaskStates.TASK_NEW:
                 return <span>ожидание</span>;
             case TaskStates.TASK_IN_PROGRESS:
-                return <img src={loader}/>;
+                return <img src={Math.random() > 0.9 ? loaderSpecial : loader}/>;
             case TaskStates.TASK_COMPLETE:
                 return <a target='_blank' href={link} download={name} className='btn btn-sm btn-primary' onClick={() => this.props.removeDownload(path)}>скачать</a>;
             case TaskStates.TASK_FAILED:

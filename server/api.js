@@ -11,6 +11,7 @@ const cors = require('@koa/cors');
 const {Model, History, ExportRvtTask, ConvertNwcTask} = require('./mongo');
 const Mongoose = require('mongoose');
 const fs = require("fs");
+const util = require('util');
 
 const TaskManager = require('./taskmanager');
 const taskManager = new TaskManager();
@@ -44,8 +45,10 @@ router.get('/models', async ctx => {
 }).get('/download/:type/:id', async ctx => {
     const taskId = ctx.params.id;
     const task = await (ctx.params.type === 'rvt' ? ExportRvtTask.findOne({id: taskId}) : ConvertNwcTask.findOne({id: taskId}));
-    if (!task) ctx.throw(404);
-    const stream = fs.createReadStream(task.resultPath);
+    if (!task) ctx.throw(404, 'task not found');
+    const exists = await util.promisify(fs.exists)(task.resultPath);
+    if(!exists) ctx.throw(404, 'file not found');
+    let stream = fs.createReadStream(task.resultPath);
     task.status = TASK_DOWNLOADED;
     await task.save();
     ctx.set('Content-type', 'application-octet/stream');

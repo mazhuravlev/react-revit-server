@@ -54,7 +54,7 @@ class App extends Component {
                         </div>
                         <div className="col-md-8 hi nopad">
                             <div className='my-menu'>
-                                <UserInfo onLogout={this.onLogout} a360={this.props.a360}/>
+                                {/*<UserInfo onLogout={this.onLogout} a360={this.props.a360}/>*/}
                             </div>
                             <Downloads/>
                             <div style={{padding: '8px'}}>
