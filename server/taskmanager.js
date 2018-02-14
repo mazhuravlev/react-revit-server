@@ -1,3 +1,16 @@
+import {TASK_COMPLETE, TASK_FAILED, TASK_NEW} from "../shared/taskStates";
+import {EXPORT_COMPLETE} from "../shared/messageTypes";
+import {
+    COMPLETE_NWC_EXCHANGE,
+    COMPLETE_NWC_QUEUE,
+    COMPLETE_RVT_EXCHANGE,
+    COMPLETE_RVT_QUEUE,
+    ERROR_NWC_QUEUE,
+    ERROR_RVT_QUEUE,
+    NWC_TASK_EXCHANGE,
+    RVT_TASK_EXCHANGE
+} from "../shared/queueNames";
+
 const nconf = require('nconf');
 const amqp = require('amqplib');
 const uuid = require("uuid");
@@ -15,13 +28,7 @@ class TaskManager {
 
     constructor() {
         this.queueServer = '10.177.100.84';
-
-        this.RVT_TASK_EXCHANGE = 'extractRvt';
-        this.NWC_TASK_EXCHANGE = 'convertNwc';
-        this.COMPLETE_RVTS_EXCANGE = 'rvt';
-        this.COMPLETE_NWCS_EXCANGE = 'nwc';
         this.clients = {};
-
         this.init();
     }
 
@@ -35,15 +42,15 @@ class TaskManager {
 
     async handleExport(conn) {
         this.exportRvtChannel = await conn.createChannel();
-        await this.setExchange(this.exportRvtChannel, this.RVT_TASK_EXCHANGE);
+        await this.setExchange(this.exportRvtChannel, RVT_TASK_EXCHANGE);
 
         this.convertNwcChannel = await conn.createChannel();
-        await this.setExchange(this.convertNwcChannel, this.NWC_TASK_EXCHANGE);
+        await this.setExchange(this.convertNwcChannel, NWC_TASK_EXCHANGE);
     }
 
     async handleComplete(conn) {
         this.completeNwcChannel = await conn.createChannel();
-        await this.setExchange(this.completeNwcChannel, this.COMPLETE_NWCS_EXCANGE, 'completeNwc', async (msg) => {
+        await this.setExchange(this.completeNwcChannel, COMPLETE_NWC_EXCHANGE, COMPLETE_NWC_QUEUE, async (msg) => {
             await this.onNwcTaskComplete(msg);
             this.completeNwcChannel.ack(msg);
             const task = await this.getNwcTask(msg);
@@ -51,7 +58,7 @@ class TaskManager {
         });
 
         this.completeRvtChannel = await conn.createChannel();
-        await this.setExchange(this.completeRvtChannel, this.COMPLETE_RVTS_EXCANGE, 'completeRvt', async (msg) => {
+        await this.setExchange(this.completeRvtChannel, COMPLETE_RVT_EXCHANGE, COMPLETE_RVT_QUEUE, async (msg) => {
             await this.onRvtTaskComplete(msg);
             this.completeRvtChannel.ack(msg);
             const task = await this.getRvtTask(msg);
@@ -61,17 +68,17 @@ class TaskManager {
 
     async handleErrors(conn) {
         this.errorRvtChannel = await conn.createChannel();
-        await this.setExchange(this.errorRvtChannel, this.COMPLETE_RVTS_EXCANGE, 'errorRvt', async (msg) => {
+        await this.setExchange(this.errorRvtChannel, COMPLETE_RVT_EXCHANGE, ERROR_RVT_QUEUE, async (msg) => {
             const obj = await this.getRvtErrorTask(msg);
-            obj.task.status = 'error';
+            obj.task.status = TASK_FAILED;
             await obj.task.save();
             this.sendCompleteTask(obj);
         });
 
         this.errorNwcChannel = await conn.createChannel();
-        await this.setExchange(this.errorNwcChannel, this.COMPLETE_NWCS_EXCANGE, 'errorNwc', async (msg) => {
+        await this.setExchange(this.errorNwcChannel, COMPLETE_NWC_EXCHANGE, ERROR_NWC_QUEUE, async (msg) => {
             const obj = await this.getNwcErrorTask(msg);
-            obj.task.status = 'error';
+            obj.task.status = TASK_FAILED;
             await obj.task.save();
             this.sendCompleteTask(obj);
         });
@@ -98,12 +105,12 @@ class TaskManager {
             server,
             owner,
             forUser,
-            status: 'new'
+            status: TASK_NEW
         };
 
         await ExportRvtTask.create(task);
 
-        this.exportRvtChannel.publish(this.RVT_TASK_EXCHANGE, server, new Buffer(JSON.stringify({
+        this.exportRvtChannel.publish(RVT_TASK_EXCHANGE, server, new Buffer(JSON.stringify({
             id: task.id,
             serverModelPath: task.serverModelPath
         })));
@@ -121,12 +128,12 @@ class TaskManager {
             rvtModelPath,
             resultPath: `${nwcResultath}${rvtModelName.replace('.rvt', '.nwc')}`,
             owner,
-            status: 'new'
+            status: TASK_NEW
         };
 
         await ConvertNwcTask.create(task);
 
-        this.convertNwcChannel.publish(this.NWC_TASK_EXCHANGE, 'CPU', new Buffer(JSON.stringify({
+        this.convertNwcChannel.publish(NWC_TASK_EXCHANGE, 'CPU', new Buffer(JSON.stringify({
             id: task.id,
             rvtModelPath: task.rvtModelPath
         })));
@@ -140,7 +147,7 @@ class TaskManager {
 
         const query = ExportRvtTask.findOne({id: id});
         let task = await query.exec();
-        task.status = 'complete';
+        task.status = TASK_COMPLETE;
         const updatedTask = await task.save();
         if (!updatedTask.forUser) await this.convertNwc(updatedTask.owner, updatedTask.serverModelPath, updatedTask.resultPath, task.name.replace('.rvt', '.nwc'));
     }
@@ -151,7 +158,7 @@ class TaskManager {
 
         const query = ConvertNwcTask.findOne({id: id});
         let task = await query.exec();
-        task.status = 'complete';
+        task.status = TASK_COMPLETE;
         await task.save();
     }
 
@@ -190,7 +197,7 @@ class TaskManager {
     }
 
     sendCompleteTask(payload) {
-        this.sendMessage(payload.task.owner, {type: 'EXPORT_COMPLETE', payload});
+        this.sendMessage(payload.task.owner, {type: EXPORT_COMPLETE, payload});
     }
 
     sendMessage(to, obj) {
