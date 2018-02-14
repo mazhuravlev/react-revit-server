@@ -1,4 +1,4 @@
-import {TASK_COMPLETE, TASK_FAILED, TASK_NEW} from "../shared/taskStates";
+import {TASK_COMPLETE, TASK_FAILED, TASK_IN_PROGRESS, TASK_NEW} from "../shared/taskStates";
 import {EXPORT_COMPLETE} from "../shared/messageTypes";
 import {
     COMPLETE_NWC_EXCHANGE,
@@ -6,7 +6,7 @@ import {
     COMPLETE_RVT_EXCHANGE,
     COMPLETE_RVT_QUEUE,
     ERROR_NWC_QUEUE,
-    ERROR_RVT_QUEUE,
+    ERROR_RVT_QUEUE, INPROGRESS_NWC_QUEUE, INPROGRESS_RVT_QUEUE,
     NWC_TASK_EXCHANGE,
     RVT_TASK_EXCHANGE
 } from "../shared/queueNames";
@@ -38,6 +38,7 @@ class TaskManager {
         await this.handleExport(conn);
         await this.handleComplete(conn);
         await this.handleErrors(conn);
+        await this.handleInProgress(conn);
     }
 
     async handleExport(conn) {
@@ -81,6 +82,28 @@ class TaskManager {
             obj.task.status = TASK_FAILED;
             await obj.task.save();
             this.sendCompleteTask(obj);
+        });
+    }
+
+    async handleInProgress() {
+        const inProgressRvtQueue = await this.exportRvtChannel.assertQueue(INPROGRESS_RVT_QUEUE, {});
+        this.exportRvtChannel.bindQueue(inProgressRvtQueue.queue, RVT_TASK_EXCHANGE, INPROGRESS_RVT_QUEUE);
+        this.exportRvtChannel.consume(inProgressRvtQueue.queue, async (msg) => {
+            const str = decoder.write(msg.content);
+            const {id} = JSON.parse(str);
+            let task = await ExportRvtTask.findOne({id});
+            task.status = TASK_IN_PROGRESS;
+            await task.save();
+        });
+
+        const inProgressNwcQueue = await this.convertNwcChannel.assertQueue(INPROGRESS_NWC_QUEUE, {});
+        this.convertNwcChannel.bindQueue(inProgressNwcQueue.queue, NWC_TASK_EXCHANGE, INPROGRESS_NWC_QUEUE);
+        this.convertNwcChannel.consume(inProgressNwcQueue.queue, async (msg) => {
+            const str = decoder.write(msg.content);
+            const {id} = JSON.parse(str);
+            let task = await ConvertNwcTask.findOne({id});
+            task.status = TASK_IN_PROGRESS;
+            await task.save();
         });
     }
 
